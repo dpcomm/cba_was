@@ -5,24 +5,34 @@
   "main": "app.ts",
   "scripts": {
     "start": "node dist//src/app.js",
-    "dev": "nodemon src/app.ts",
+    "dev": "nodemon --exec ts-node -r tsconfig-paths/register src/app.ts",
     "build": "tsc -p ."
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
+    "@types/jsonwebtoken": "^9.0.6",
     "@types/node": "^20.12.12",
     "express": "^4.19.2",
     "nodemon": "^3.1.0",
+    "prisma": "^5.14.0",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.4.5"
   },
   "dependencies": {
     "@prisma/client": "^5.14.0",
+    "bcrypt": "^5.1.1",
+    "body-parser": "^1.20.2",
     "cors": "^2.8.5",
-    "dotenv": "^16.4.5"
+    "dotenv": "^16.4.5",
+    "jsonwebtoken": "^9.0.2",
+    "redis": "^4.6.6",
+    "tsconfig-paths": "^4.2.0",
+    "winston": "^3.13.0",
+    "winston-daily-rotate-file": "^5.0.0"
   }
 }

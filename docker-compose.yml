@@ -1,7 +1,7 @@
 version: '3'
 services:
   mysql:
-    image: mysql:latest
+    image: mysql:8.0
     container_name: mysql
     environment:
       MYSQL_DATABASE: cbaapp
@@ -13,12 +13,12 @@ services:
       - '3306:3306'
     volumes:
       - cbaapp:/var/lib/mysql
-  # redis:
-  #   container_name: redis
-  #   image: redis:latest
-  #   command: redis-server --port 6379
-  #   ports:
-  #     - 6379:6379
+  redis:
+    container_name: redis
+    image: redis:latest
+    command: redis-server --port 6379
+    ports:
+      - 6379:6379
   # was:
   #   container_name: was
   #   volumes:

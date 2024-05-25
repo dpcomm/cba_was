@@ -1,24 +1,23 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
-import userRouter from "./routes/user";
-
-const app = express();
+import bodyParser from "body-parser";
+import userRouter from "@routes/user";
+import logger from "@utils/logger";
+import redisClient from "@utils/redis";
 
 dotenv.config();
+const app = express();
 
-const port = 3000;
+redisClient.connect().catch(logger.error);
+redisClient.on('connect', () => { logger.info("Redis connected on redis container") });
+redisClient.on('error', (err: any) => { logger.error(`Redis client error`, err) });
 
 app.use(cors());
+app.use(bodyParser.json());
 
-// app.get("/", (req, res) => {
-//     console.log(process.cwd());
-//     res.send("Hello World!");
-// });
-
-app.use("/api/auth", userRouter);
 app.use("/api/user", userRouter);
 
-app.listen(port, () => {
-	console.log(`Server app listening on port ${port}`);
+app.listen(process.env.SERVER_PORT, () => {
+	logger.info(`Server app listening on port ${process.env.SERVER_PORT}`);
 });
