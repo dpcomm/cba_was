@@ -16,8 +16,9 @@ app.use(cors());
 //     res.send("Hello World!");
 // });
 
-app.use("/user", userRouter);
+app.use("/api/auth", userRouter);
+app.use("/api/user", userRouter);
 
 app.listen(port, () => {
-    console.log(`Server app listening on port ${port}`);
+	console.log(`Server app listening on port ${port}`);
 });

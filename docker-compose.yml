@@ -1,0 +1,34 @@
+version: '3'
+services:
+  mysql:
+    image: mysql:latest
+    container_name: mysql
+    environment:
+      MYSQL_DATABASE: cbaapp
+      MYSQL_USER: cba
+      MYSQL_PASSWORD: 1234
+    env_file:
+      - ./.env
+    ports:
+      - '3306:3306'
+    volumes:
+      - cbaapp:/var/lib/mysql
+  # redis:
+  #   container_name: redis
+  #   image: redis:latest
+  #   command: redis-server --port 6379
+  #   ports:
+  #     - 6379:6379
+  # was:
+  #   container_name: was
+  #   volumes:
+  #     - ./:/app
+  #   build:
+  #     dockerfile: ./dockerfile
+  #   ports:
+  #     - "3000:3000"
+  #   env_file:
+  #     - .env
+  #   restart: always
+volumes:
+  cbaapp:
