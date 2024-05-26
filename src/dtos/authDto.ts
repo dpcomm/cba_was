@@ -4,6 +4,10 @@ export interface requestLoginUserDto {
   autoLogin: boolean,
 }
 
+export interface requestLogoutUserDto {
+  id: number
+}
+
 export interface requestRegisterUserDto {
   userId: string,
   password: string,
@@ -12,4 +16,9 @@ export interface requestRegisterUserDto {
   phoneNumber: string,
   birthDate: string,
   gender: string,
+}
+
+export interface requestRefreshAccessTokenDto {
+  accessToken: string,
+  refreshToken: string,
 }

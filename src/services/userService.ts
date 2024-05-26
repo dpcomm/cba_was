@@ -1,12 +1,13 @@
-import { requestLoginUserDto, requestRegisterUserDto } from "@dtos/authDto";
+import { requestLoginUserDto, requestLogoutUserDto, requestRefreshAccessTokenDto, requestRegisterUserDto } from "@dtos/authDto";
 import bcrypt from "bcrypt";
 import AuthRepository from "@repositories/authRepository";
 import { user } from "@/types/default";
-import JwtExtractor from "@utils/jwtExtractor";
+import JwtProvider from "@utils/jwtProvider";
 import redisClient from "@utils/redis";
+import { decode } from "jsonwebtoken";
 
 const authRepository = new AuthRepository();
-const jwtExtractor = new JwtExtractor();
+const jwtProvider = new JwtProvider();
 
 class UserService {
   async login(userDTO: requestLoginUserDto) {
@@ -19,7 +20,7 @@ class UserService {
       if (!isPasswordCorrect) throw new Error("Incorrect password");
 
       const accessToken = await new Promise((resolve, reject) => {
-        jwtExtractor.signAccessToken(user, (err: any, accessToken: string) => {
+        jwtProvider.signAccessToken(user, (err: any, accessToken: string) => {
           if (err) reject(err);
           resolve(accessToken);
         });
@@ -27,7 +28,7 @@ class UserService {
 
       if (userDTO.autoLogin) {
         const refreshToken = await new Promise((resolve, reject) => {
-          jwtExtractor.signRefreshToken((err: any, refreshToken: string) => {
+          jwtProvider.signRefreshToken((err: any, refreshToken: string) => {
             if (err) reject(err);
             resolve(refreshToken);
           });
@@ -37,7 +38,8 @@ class UserService {
           ok: 1,
           message: "Authorize success",
           accessToken,
-          refreshToken
+          refreshToken,
+          user
         });
       }
 
@@ -45,8 +47,21 @@ class UserService {
         ok: 1,
         message: "Authorize success",
         accessToken,
+        user
       });
     } catch(err) {
+      throw err;
+    }
+  }
+  async logout(userDTO: requestLogoutUserDto) {
+    try {
+      let stringId = String(userDTO.id);
+      const n = await redisClient.exists(stringId);
+      n && await redisClient.del(stringId);
+      return ({
+        ok: 1,
+      });
+    } catch(err: any) {
       throw err;
     }
   }
@@ -75,7 +90,50 @@ class UserService {
         message: "Register success",
       });
     } catch(err) {
-      throw err
+      throw err;
+    }
+  }
+  async refreshAccessToken(userDTO: requestRefreshAccessTokenDto) {
+    try {
+      const verifyAccessTokenResult = await jwtProvider.verifyAccessToken(userDTO.accessToken);
+      if (verifyAccessTokenResult.message !== "jwt expired") {
+        return ({
+          ok: 0,
+          message: "Token has not expired"
+        });
+      }
+
+      const decodedAccessToken: any = await decode(userDTO.accessToken);
+      const refreshToken: any = await redisClient.get(String(decodedAccessToken.id));
+      if (userDTO.refreshToken !== refreshToken) {
+        return ({
+          ok: 0,
+          message: "Token does not match"
+        });
+      }
+
+      const verifyRefreshTokenResult = await jwtProvider.verifyRefreshToken(refreshToken);
+      if (!verifyRefreshTokenResult) {
+        return ({
+          ok: 0,
+          message: "Invaild refresh token"
+        });
+      }
+
+      const accessToken = await new Promise((resolve, reject) => {
+        jwtProvider.signAccessToken(decodedAccessToken, (err: any, accessToken: string) => {
+          if (err) reject(err);
+          resolve(accessToken);
+        });
+      });
+
+      return ({
+        ok: 1,
+        message: "Token reissue success",
+        accessToken,
+      });
+    } catch(err) {
+      throw err;
     }
   }
 }

@@ -6,6 +6,8 @@ const userController = new UserController();
 
 userRouter.get('/', userController.getUser);
 userRouter.post('/login', userController.login);
+userRouter.post('/logout', userController.logout);
 userRouter.post('/register', userController.register);
+userRouter.post('/refresh', userController.refreshAccessToken);
 
 export default userRouter;

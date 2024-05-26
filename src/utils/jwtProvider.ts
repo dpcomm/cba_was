@@ -1,11 +1,11 @@
 import { user } from "@/types/default";
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 
 const secret = process.env.JWT_SECRET || 'default_secret';
 const expirentTime = process.env.JWT_EXPIRENTTIME || "1600";
 const refreshExpirentTime = process.env.JWT_REFRESH_EXPIRENTTIME || "604800"
 
-class JwtExtractor {
+class JwtProvider {
   async signAccessToken (user: user, callback: any){
     try {
       jwt.sign(
@@ -57,6 +57,29 @@ class JwtExtractor {
       callback(err, null);
     }
   }
+
+  async verifyAccessToken(token: string) {
+    let decoded: any = null;
+    try {
+      decoded = await jwt.verify(token, secret)
+      return {
+        id: decoded.id
+      }
+    } catch (err: any) {
+      return {
+        message: err.message
+      }
+    }
+  }
+
+  async verifyRefreshToken(refresh: string) {
+    try {
+      await jwt.verify(refresh, secret);
+      return true;
+    } catch (err) {
+      return false;
+    }
+  };
 }
 
-export default JwtExtractor;
+export default JwtProvider;

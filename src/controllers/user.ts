@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import UserService from '@services/userService';
-import { requestLoginUserDto, requestRegisterUserDto } from '@dtos/authDto';
+import { requestLoginUserDto, requestLogoutUserDto, requestRefreshAccessTokenDto, requestRegisterUserDto } from '@dtos/authDto';
 import logger from '@utils/logger';
 
 const userService = new UserService();
@@ -25,27 +25,62 @@ class UserController {
     } catch (err: any) {
       logger.error("Login controller error:", err.message)
       return res.status(500).json({
-        message: "Failed to login",
-        err: err.message
+        message: err.message,
+        err: err
+      });
+    }
+  }
+
+  async logout(req: Request, res: Response) {
+    try {
+      const userDTO: requestLogoutUserDto = req.body;
+      const logoutData = await userService.logout(userDTO);
+      if (logoutData.ok) {
+        return res.status(200).json({
+          message: "Logout success"
+        });
+      }
+      return res.status(401).json({
+        message: "Logout failed"
+      });
+    } catch(err: any) {
+      logger.error("logout controller error:", err.message);
+      return res.status(500).json({
+        message: err.message,
+        err: err
       });
     }
   }
 
   async register(req: Request, res: Response) {
     try {
-      console.log(req.body);
       const userDto: requestRegisterUserDto = req.body;
-      console.log(req.body);
-      const registerData = await userService.register(userDto);
-      console.log(registerData);
+      await userService.register(userDto);
       return res.status(200).json({
         message: "Register success"
       })
     } catch(err: any) {
       logger.error("Register controller error:", err.message);
       return res.status(500).json({
-        message: "Failed to register",
-        err: err.message
+        message: err.message,
+        err: err
+      });
+    }
+  }
+
+  async refreshAccessToken(req: Request, res: Response) {
+    try {
+      const userDto: requestRefreshAccessTokenDto = req.body;
+      const refreshAccessTokenData = await userService.refreshAccessToken(userDto);
+      return res.status(200).json({
+        message: "Refresh access token success",
+        accessToken: refreshAccessTokenData.accessToken
+      })
+    } catch(err: any) {
+      logger.error("refreshAccessToken controller error:", err.message);
+      return res.status(500).json({
+        message: err.message,
+        err: err
       });
     }
   }
