@@ -33,7 +33,7 @@
       "@controllers/*": ["src/controllers/*"],
       "@dtos/*": ["src/dtos/*"],
       "@middlewares/*": ["src/middlewares/*"],
-      "@models/*": ["src/models/*"],
+      "@prisma/*": ["src/prisma/*"],
       "@repositories/*": ["src/repositories/*"],
       "@routes/*": ["src/routes/*"],
       "@services/*": ["src/services/*"],
