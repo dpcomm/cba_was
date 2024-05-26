@@ -18,7 +18,6 @@ class UserController {
           user: loginData.user
         });
       }
-      console.log("")
       return res.status(401).json({
         message: loginData.message,
       })
