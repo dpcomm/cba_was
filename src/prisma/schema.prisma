@@ -18,8 +18,8 @@ model User {
   birthDate        DateTime
   gender           String
   role             String          @default("M")
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
   retreat_infos    RetreatInfo[]
   survey_responses SurveyResponse?
 

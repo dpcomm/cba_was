@@ -14,10 +14,20 @@ class UserService {
     try {
       const user: user | null = await authRepository.findUser(userDTO.userId);
 
-      if (!user) throw new Error("Unregisterd user");
+      if (!user) {
+        return ({
+          ok: 0,
+          message: "Unregisterd user"
+        })
+      };
 
       const isPasswordCorrect = await bcrypt.compare(userDTO.password, user.password);
-      if (!isPasswordCorrect) throw new Error("Incorrect password");
+      if (!isPasswordCorrect) {
+        return ({
+          ok: 0,
+          message: "Incorrect password"
+        })
+      };
 
       const accessToken = await new Promise((resolve, reject) => {
         jwtProvider.signAccessToken(user, (err: any, accessToken: string) => {

@@ -7,6 +7,7 @@ const userService = new UserService();
 
 class UserController {
   async login(req: Request, res: Response) {
+    console.log("hello world");
     try {
       const userDTO: requestLoginUserDto = req.body;
       const loginData: any = await userService.login(userDTO);
@@ -22,7 +23,7 @@ class UserController {
         message: loginData.message,
       })
     } catch (err: any) {
-      logger.error("Login controller error:", err.message)
+      logger.error("Login controller error:", err)
       return res.status(500).json({
         message: err.message,
         err: err
@@ -43,7 +44,7 @@ class UserController {
         message: "Logout failed"
       });
     } catch(err: any) {
-      logger.error("logout controller error:", err.message);
+      logger.error("logout controller error:", err);
       return res.status(500).json({
         message: err.message,
         err: err
@@ -59,7 +60,7 @@ class UserController {
         message: "Register success"
       })
     } catch(err: any) {
-      logger.error("Register controller error:", err.message);
+      logger.error("Register controller error:", err);
       return res.status(500).json({
         message: err.message,
         err: err
@@ -76,7 +77,7 @@ class UserController {
         accessToken: refreshAccessTokenData.accessToken
       })
     } catch(err: any) {
-      logger.error("refreshAccessToken controller error:", err.message);
+      logger.error("refreshAccessToken controller error:", err);
       return res.status(500).json({
         message: err.message,
         err: err
@@ -92,7 +93,7 @@ class UserController {
 
       });
     } catch(err: any) {
-      logger.error("getUser controller error:", err.message);
+      logger.error("getUser controller error:", err);
       return res.status(401).json({
         message: err.message,
       })

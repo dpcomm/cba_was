@@ -5,13 +5,13 @@ services:
     container_name: mysql
     environment:
       MYSQL_ROOT_PASSWORD: 1234
-      MYSQL_DATABASE: cbaapp
     env_file:
       - ./.env
     ports:
       - '3306:3306'
     volumes:
       - cbaapp:/var/lib/mysql
+      - ./init_db.sql:/docker-entrypoint-initdb.d/init_db.sql
   redis:
     container_name: redis
     image: redis:latest
