@@ -4,9 +4,8 @@ services:
     image: mysql:8.0
     container_name: mysql
     environment:
+      MYSQL_ROOT_PASSWORD: 1234
       MYSQL_DATABASE: cbaapp
-      MYSQL_USER: cba
-      MYSQL_PASSWORD: 1234
     env_file:
       - ./.env
     ports:
