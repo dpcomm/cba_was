@@ -13,7 +13,7 @@ class UserService {
   async login(userDTO: requestLoginUserDto) {
     try {
       const user: user | null = await authRepository.findUser(userDTO.userId);
-
+      console.log("hello");
       if (!user) {
         return ({
           ok: 0,
@@ -77,7 +77,16 @@ class UserService {
   }
   async register(userDTO: requestRegisterUserDto) {
     try {
+      const user: user | null = await authRepository.findUser(userDTO.userId);
       const passwordPattern = /^(?=.*[a-zA-Z])(?=.*\d).{10,}$/;
+
+      if (user) {
+        return ({
+          ok: 0,
+          message: "Duplicated id"
+        })
+      };
+
       if (!userDTO) {
         return ({
           ok: 0,

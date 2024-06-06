@@ -13,9 +13,9 @@ model User {
   userId           String          @unique
   password         String
   name             String
-  affiliation      String
-  phoneNumber      String          @unique
-  birthDate        DateTime
+  group            String
+  phone            String          @unique
+  birth            DateTime
   gender           String
   role             String          @default("M")
   createdAt        DateTime @default(now())

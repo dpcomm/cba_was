@@ -10,10 +10,11 @@ class AuthRepository {
         userId: userDTO.userId,
         password: hash,
         name: userDTO.name,
-        affiliation: userDTO.affiliation,
-        phoneNumber: userDTO.phoneNumber,
-        birthDate: new Date(userDTO.birthDate),
-        gender: userDTO.gender
+        group: userDTO.group,
+        phone: userDTO.phone,
+        birth: new Date(userDTO.birth),
+        gender: userDTO.gender,
+        role: "M"
       }
     });
   }

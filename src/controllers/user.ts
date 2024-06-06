@@ -7,7 +7,6 @@ const userService = new UserService();
 
 class UserController {
   async login(req: Request, res: Response) {
-    console.log("hello world");
     try {
       const userDTO: requestLoginUserDto = req.body;
       const loginData: any = await userService.login(userDTO);
@@ -21,7 +20,7 @@ class UserController {
       }
       return res.status(401).json({
         message: loginData.message,
-      })
+      });
     } catch (err: any) {
       logger.error("Login controller error:", err)
       return res.status(500).json({
@@ -55,10 +54,15 @@ class UserController {
   async register(req: Request, res: Response) {
     try {
       const userDto: requestRegisterUserDto = req.body;
-      await userService.register(userDto);
-      return res.status(200).json({
-        message: "Register success"
-      })
+      const registerData = await userService.register(userDto);
+      if (registerData.ok) {
+        return res.status(200).json({
+          message: "Register success"
+        });
+      }
+      return res.status(401).json({
+        message: registerData.message
+      });
     } catch(err: any) {
       logger.error("Register controller error:", err);
       return res.status(500).json({
@@ -72,10 +76,15 @@ class UserController {
     try {
       const userDto: requestRefreshAccessTokenDto = req.body;
       const refreshAccessTokenData = await userService.refreshAccessToken(userDto);
-      return res.status(200).json({
-        message: "Refresh access token success",
-        accessToken: refreshAccessTokenData.accessToken
-      })
+      if (refreshAccessTokenData.ok) {
+        return res.status(200).json({
+          message: "Refresh access token success",
+          accessToken: refreshAccessTokenData.accessToken
+        })
+      }
+      return res.status(401).json({
+        message: refreshAccessTokenData.message
+      });
     } catch(err: any) {
       logger.error("refreshAccessToken controller error:", err);
       return res.status(500).json({
