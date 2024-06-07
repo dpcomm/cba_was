@@ -7,7 +7,7 @@ const userService = new UserService();
 
 class UserController {
   async login(req: Request, res: Response) {
-    console.log("hello world");
+
     try {
       const userDTO: requestLoginUserDto = req.body;
       const loginData: any = await userService.login(userDTO);
@@ -55,6 +55,7 @@ class UserController {
   async register(req: Request, res: Response) {
     try {
       const userDto: requestRegisterUserDto = req.body;
+      console.log(userDto);
       await userService.register(userDto);
       return res.status(200).json({
         message: "Register success"

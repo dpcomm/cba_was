@@ -3,8 +3,8 @@ export interface user {
   userId: string,
   password: string,
   name: string,
-  affiliation: string,
-  phoneNumber: string,
-  birthDate: Date,
+  group: string,
+  phone: string,
+  birth: Date,
   gender: string,
 }

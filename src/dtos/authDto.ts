@@ -12,9 +12,9 @@ export interface requestRegisterUserDto {
   userId: string,
   password: string,
   name: string,
-  affiliation: string,
-  phoneNumber: string,
-  birthDate: string,
+  group: string,
+  phone: string,
+  birth: string,
   gender: string,
 }
 
