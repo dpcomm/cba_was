@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        GIT_URL = "https://github.com/dpcomm/cba_app.git"
+        GIT_URL = "https://github.com/dpcomm/cba_was.git"
     }
     stages {
         stage('Pull') {
