@@ -21,7 +21,7 @@ services:
       - .env
     restart: always
     depends_on:
-      - react-builder
+      - redis
 networks:
   ws_proxy:
     external: true
