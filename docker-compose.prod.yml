@@ -12,8 +12,6 @@ services:
     container_name: cba_was
     networks:
       - ws_proxy
-    volumes:
-      - ./:/app
     build:
       context: .
       dockerfile: ./dockerfile.prod
@@ -22,6 +20,8 @@ services:
     env_file:
       - .env
     restart: always
+    depends_on:
+      - react-builder
 networks:
   ws_proxy:
     external: true
