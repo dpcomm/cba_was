@@ -15,6 +15,7 @@ services:
     volumes:
       - ./:/app
     build:
+      context: .
       dockerfile: ./dockerfile.prod
     ports:
       - "8001:8001"
