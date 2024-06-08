@@ -8,7 +8,7 @@ pipeline {
         stage('Pull') {
             steps {
                 echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
-                git url: "${GIT_URL}", branch: "master", poll: true, changelog: true
+                git url: "${GIT_URL}", branch: "main", poll: true, changelog: true
                 sh 'sudo cp /home/joeykim/cba/was_data/.env /var/lib/jenkins/workspace/cba_was'
             }
         }
