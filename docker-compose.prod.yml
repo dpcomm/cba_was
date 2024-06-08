@@ -21,9 +21,6 @@ services:
     env_file:
       - .env
     restart: always
-volumes:
-  cbaapp:
-
 networks:
   ws_proxy:
     external: true
