@@ -16,8 +16,6 @@ docker-compose down
 docker system prune -a
 
 docker volume prune // 기존 볼륨(데이터베이스)도 날리고 싶을 때.
-
-docker-compose up -d
 ```
 
 ## 1. local dev test

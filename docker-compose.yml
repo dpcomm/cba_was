@@ -18,16 +18,5 @@ services:
     command: redis-server --port 6379
     ports:
       - 6379:6379
-  # was:
-  #   container_name: was
-  #   volumes:
-  #     - ./:/app
-  #   build:
-  #     dockerfile: ./dockerfile
-  #   ports:
-  #     - "3000:3000"
-  #   env_file:
-  #     - .env
-  #   restart: always
 volumes:
   cbaapp:
