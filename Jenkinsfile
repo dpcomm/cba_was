@@ -9,7 +9,7 @@ pipeline {
             steps {
                 echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
                 git url: "${GIT_URL}", branch: "main", poll: true, changelog: true
-                sh 'sudo cp /home/joeykim/cba/was_data/.env /var/lib/jenkins/workspace/cba_was'
+                sh 'sudo cp /home/joey/cba/was_data/.env /var/lib/jenkins/workspace/cba_was'
             }
         }
         stage('Wipe') {
