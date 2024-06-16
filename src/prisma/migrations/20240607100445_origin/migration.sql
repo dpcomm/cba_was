@@ -4,16 +4,16 @@ CREATE TABLE `users` (
     `userId` VARCHAR(191) NOT NULL,
     `password` VARCHAR(191) NOT NULL,
     `name` VARCHAR(191) NOT NULL,
-    `affiliation` VARCHAR(191) NOT NULL,
-    `phoneNumber` VARCHAR(191) NOT NULL,
-    `birthDate` DATETIME(3) NOT NULL,
+    `group` VARCHAR(191) NOT NULL,
+    `phone` VARCHAR(191) NOT NULL,
+    `birth` DATETIME(3) NOT NULL,
     `gender` VARCHAR(191) NOT NULL,
     `role` VARCHAR(191) NOT NULL DEFAULT 'M',
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
     UNIQUE INDEX `users_userId_key`(`userId`),
-    UNIQUE INDEX `users_phoneNumber_key`(`phoneNumber`),
+    UNIQUE INDEX `users_phone_key`(`phone`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 

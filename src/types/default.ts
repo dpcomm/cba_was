@@ -1,4 +1,5 @@
 export interface user {
+
   id: number,
   userId: string,
   password: string,
@@ -7,4 +8,5 @@ export interface user {
   phone: string,
   birth: Date,
   gender: string,
+  role: string
 }
