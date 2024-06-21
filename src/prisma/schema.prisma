@@ -9,51 +9,46 @@ datasource db {
 }
 
 model User {
-  id               Int             @id @default(autoincrement())
-  userId           String          @unique
-  password         String
-  name             String
-  group            String
-  phone            String          @unique
-  birth            DateTime
-  gender           String
-  role             String          @default("M")
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-  retreat_infos    RetreatInfo[]
-  survey_responses SurveyResponse?
-
-  @@map("users")
+  id        Int       @id @default(autoincrement())
+  rank      String    @default("M")
+  userId    String    @unique
+  password  String
+  name      String
+  group     String
+  phone     String
+  birth     DateTime
+  gender    String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  applications Application[]
 }
 
-model SurveyResponse {
-  id            Int     @id @default(autoincrement())
-  userId        String  @unique
-  role          String
-  breakfastDay1 Boolean
-  lunchDay1     Boolean
-  dinnerDay1    Boolean
-  breakfastDay2 Boolean
-  lunchDay2     Boolean
-  dinnerDay2    Boolean
-  breakfastDay3 Boolean
-  lunchDay3     Boolean
-  transportType String
-  carPlate      String?
-  ssn           String
-  insurance     Boolean
-  user          User    @relation(fields: [userId], references: [userId])
-
-  @@map("survey_responses")
+model Application {
+  id         Int       @id @default(autoincrement())
+  idn        String
+  surveyData Json      //{"meal":{3x3array},"transfer":{"own-car":string,"bus":[1,1]}}
+  attended   Boolean   @default(false)
+  feePaid    Boolean   @default(false) 
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  userId     String    @unique
+  retreatId  Int
+  user       User      @relation(fields: [userId], references: [userId])
+  retreat    Retreat   @relation(fields: [retreatId], references: [id])
 }
 
-model RetreatInfo {
-  id                 Int     @id @default(autoincrement())
-  userId             String
-  feePaid            Boolean
-  onsiteRegistration Boolean
-  user               User    @relation(fields: [userId], references: [userId])
-
-  @@index([userId], map: "retreat_infos_userId_fkey")
-  @@map("retreat_infos")
+model Retreat {
+  id         Int       @id @default(autoincrement())
+  title      String
+  date       DateTime
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  applications Application[]
 }
+
+model Youtube {
+  id        Int      @id @default(autoincrement())
+  link      String
+  createdAt DateTime @default(now())
+}
+
