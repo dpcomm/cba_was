@@ -13,10 +13,7 @@ redisClient.connect().catch(logger.error);
 redisClient.on('connect', () => { logger.info("Redis connected on redis container") });
 redisClient.on('error', (err: any) => { logger.error(`Redis client error`, err) });
 
-app.use(cors({
-  origin: 'http://localhost:8080',
-  optionsSuccessStatus: 200
-}));
+app.use(cors());
 app.use(bodyParser.json());
 
 app.use("/api/user", userRouter);

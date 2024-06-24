@@ -16,9 +16,26 @@ export interface requestRegisterUserDto {
   phone: string,
   birth: string,
   gender: string,
+  etcGroup?: string
 }
 
 export interface requestRefreshAccessTokenDto {
   accessToken: string,
   refreshToken: string,
+}
+
+export interface updateUserDto {
+  userId: string,
+  password: string,
+  name: string,
+  group: string,
+  phone: string,
+  birth: string,
+  gender: string
+  etcGroup?: string
+}
+
+export interface checkUserDto {
+  userId: string,
+  password: string
 }

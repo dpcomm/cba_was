@@ -1,4 +1,4 @@
-import { requestLoginUserDto, requestLogoutUserDto, requestRefreshAccessTokenDto, requestRegisterUserDto } from "@dtos/authDto";
+import { checkUserDto, requestLoginUserDto, requestLogoutUserDto, requestRefreshAccessTokenDto, requestRegisterUserDto,updateUserDto } from "@dtos/authDto";
 import bcrypt from "bcrypt";
 import AuthRepository from "@repositories/authRepository";
 import { user } from "@/types/default";
@@ -6,14 +6,18 @@ import JwtProvider from "@utils/jwtProvider";
 import redisClient from "@utils/redis";
 import { decode } from "jsonwebtoken";
 
+import { requestSurveyResponseDto } from "@dtos/surveyDto";
+import SurveyRepository from "@repositories/surveyRepository";
+
 const authRepository = new AuthRepository();
 const jwtProvider = new JwtProvider();
+
+const surveyRepository = new SurveyRepository();
 
 class UserService {
   async login(userDTO: requestLoginUserDto) {
     try {
       const user: user | null = await authRepository.findUser(userDTO.userId);
-
       if (!user) {
         return ({
           ok: 0,
@@ -77,7 +81,16 @@ class UserService {
   }
   async register(userDTO: requestRegisterUserDto) {
     try {
+      const user: user | null = await authRepository.findUser(userDTO.userId);
       const passwordPattern = /^(?=.*[a-zA-Z])(?=.*\d).{10,}$/;
+
+      if (user) {
+        return ({
+          ok: 0,
+          message: "Duplicated id"
+        })
+      };
+
       if (!userDTO) {
         return ({
           ok: 0,
@@ -145,6 +158,64 @@ class UserService {
       });
     } catch(err) {
       throw err;
+    }
+  }
+  // async getUserInfo()
+
+  async surveyResponseSave(surveyDTO:requestSurveyResponseDto) {
+    try {
+      await surveyRepository.CreateSurvey(surveyDTO);
+      return ({
+        ok: 1,
+        message: "Survey Response Success"
+      })}
+    catch(err) {
+      throw err; 
+    }
+  }
+  async updateUserInfo(updateDTO:updateUserDto) {
+    try {
+    
+      const passwordPattern = /^(?=.*[a-zA-Z])(?=.*\d).{10,}$/;
+      if (!passwordPattern.test(updateDTO.password)) {
+        return ({
+          ok: 0,
+          message: "Password pattern unfulfilled"
+        });
+      }
+      const salt = bcrypt.genSaltSync(10);
+      const hash = bcrypt.hashSync(updateDTO.password, salt);
+
+      await authRepository.updateUser(updateDTO,hash);
+      return ({
+        ok: 1,
+        message: "Update User Success"
+      })
+    } catch(err) {
+      throw err;
+    }
+  }
+  async checkUserInfo (checkuser:checkUserDto) {
+    try {
+      const currentData = await authRepository.findUser(checkuser.userId);
+      const currentHash = currentData?.password ?? ""; //currentData가 null(undefined) & currentData.password도 null(undefined)일때 "" 반환 
+
+      const passwordPattern = /^(?=.*[a-zA-Z])(?=.*\d).{10,}$/;
+      if (!passwordPattern.test(checkuser.password)) {
+        return ({
+          ok: 0,
+          message: "Password pattern unfulfilled"
+        });
+      }
+      const checkPassword = bcrypt.compareSync(checkuser.password, currentHash);
+      if (checkPassword) {
+        return {ok: 1, message: "본인인증 완료",data:currentData};
+      } else { 
+        return {ok: 0, message: "잘못된 비밀번호가 입력되었습니다."};
+    }
+    } catch (error) {
+      console.error("Error in password check:",error);
+      return { ok:0, message: "An error occurred while checking the password."};
     }
   }
 }
