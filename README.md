@@ -16,8 +16,6 @@ docker-compose down
 docker system prune -a
 
 docker volume prune // 기존 볼륨(데이터베이스)도 날리고 싶을 때.
-
-docker-compose up -d
 ```
 
 ## 1. local dev test
@@ -26,8 +24,6 @@ docker-compose up -d
 docker-compose up -d
 
 npm run dev
-
-이후 docker
 ```
 
 ## 2. Prisma migration 파일 생성
@@ -49,7 +45,13 @@ npx prisma migrate dev --name (원하는 마이그레이션 파일 이름)
 
 레파지터리 pull 이후 prisma 마이그레이션 해주어야 함.
 
+```
 npx prisma migrate deploy
+```
+
+## 4. migration db push
+```
+npx prisma db push
 ```
 
 dir 구조
