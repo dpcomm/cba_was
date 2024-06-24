@@ -16,7 +16,7 @@ class AuthRepository {
         phone: userDTO.phone,
         birth: new Date(userDTO.birth),
         gender: userDTO.gender,
-        role: "M"
+        rank: "M"
       }
     });
   }

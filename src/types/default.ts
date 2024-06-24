@@ -8,5 +8,5 @@ export interface user {
   phone: string,
   birth: Date,
   gender: string,
-  role: string
+  rank: string
 }

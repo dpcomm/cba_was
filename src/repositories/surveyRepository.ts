@@ -1,40 +1,39 @@
 import { requestSurveyResponseDto } from '@dtos/surveyDto';
-import { PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient()
 
 class SurveyRepository {
     async CreateSurvey(surveyDTO: requestSurveyResponseDto) {
-        return await prisma.surveyResponse.create({
+        return await prisma.application.create({
             data : {
                 userId: surveyDTO.userId,
-                role: surveyDTO.role,
-                breakfastDay1: surveyDTO.breakfastDay1, // 허수를 둬야할지 고민해야함
-                lunchDay1: surveyDTO.lunchDay1,
-                dinnerDay1: surveyDTO.dinnerDay1,
-                breakfastDay2: surveyDTO.breakfastDay2,
-                lunchDay2: surveyDTO.lunchDay2,
-                dinnerDay2: surveyDTO.dinnerDay2,
-                breakfastDay3: surveyDTO.breakfastDay3,
-                lunchDay3: surveyDTO.lunchDay3,
-                transportType: surveyDTO.transportType,
-                carPlate: surveyDTO.carPlate,
-                ssn: surveyDTO.ssn,
-                insurance: surveyDTO.insurance
+                idn: surveyDTO.idn,
+                surveyData: JSON.parse(surveyDTO.surveyData),
+                attended: !!surveyDTO.attended,
+                feePaid: !!surveyDTO.feePaid,
+                retreatId: surveyDTO.retreatId
             }
         })
     }
     async findResponse(userId: string) {
-        return await prisma.surveyResponse.findUnique({
+        return await prisma.application.findUnique({
             where: {
                 userId: userId
             }
         });
     }
     async updateResponse(data: requestSurveyResponseDto) {
-        return await prisma.surveyResponse.update({
+        return await prisma.application.update({
             where: {userId: data.userId},
-            data: data,
+            data: {
+                userId: data.userId,
+                idn: data.idn,
+                surveyData: JSON.parse(data.surveyData),
+                attended: !!data.attended,
+                feePaid: !!data.feePaid,
+                retreatId: data.retreatId
+            },
         })
     }
 }
