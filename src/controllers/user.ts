@@ -4,6 +4,7 @@ import { checkUserDto,requestLoginUserDto, requestLogoutUserDto, requestRefreshA
 import logger from '@utils/logger';
 
 import { requestSurveyResponseDto } from '@dtos/surveyDto';
+import SurveyRepository from '@repositories/surveyRepository';
 
 const userService = new UserService();
 
@@ -111,27 +112,6 @@ class UserController {
       })
     }
   }
-  async surveyResponse(req:Request,res:Response) {
-    try {
-      const surveyDto: requestSurveyResponseDto = req.body;
-      const surveyData = await userService.surveyResponseSave(surveyDto);
-      if (surveyData.ok) {
-        console.log(surveyDto);
-        return res.status(200).json({
-          message: "Survey Register Success"
-        });
-      }
-      return res.status(401).json({
-        message: surveyData.message
-      });
-    } catch(err: any) {
-      logger.error("Survey controller error:", err);
-      return res.status(500).json({
-        message: err.message,
-        err: err
-      });
-    }
-  }
   async updateUser(req:Request,res:Response) {
     try {
       const updateDto: updateUserDto = req.body;
@@ -175,6 +155,35 @@ class UserController {
           });
         }
   }
+  async surveyResponse(req:Request,res:Response) {
+    try {
+      const surveyDto: requestSurveyResponseDto = req.body;
+      console.log(surveyDto);
+      const surveyData = await userService.surveyResponseSave(surveyDto);
+      if (surveyData.ok) {
+        console.log(surveyDto);
+        return res.status(200).json({
+          message: "Survey Register Success"
+        });
+      }
+      return res.status(401).json({
+        message: surveyData.message
+      });
+    } catch(err: any) {
+      logger.error("Survey controller error:", err);
+      return res.status(500).json({
+        message: err.message,
+        err: err
+      });
+    }
+  }
+  // async getResponse(req:Request, res:Response) {
+  //   try {
+  //     res.send(
+  //       SurveyRepository.findResponse
+  //     )
+  //   }
+  // }
 }
 
 export default UserController;

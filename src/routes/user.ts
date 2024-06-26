@@ -13,6 +13,7 @@ userRouter.post('/login', userController.login);
 userRouter.post('/logout', userController.logout);
 userRouter.post('/register', userController.register);
 userRouter.post('/refresh', userController.refreshAccessToken);
+userRouter.post('/survey', userController.surveyResponse);
 
 
 userRouter.get('/backoffice',admincontroller.UserTable);

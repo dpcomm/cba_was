@@ -163,16 +163,31 @@ class UserService {
   // async getUserInfo()
 
   async surveyResponseSave(surveyDTO:requestSurveyResponseDto) {
+
     try {
-      await surveyRepository.CreateSurvey(surveyDTO);
+      const existResponse = await surveyRepository.findResponse(surveyDTO.userId)
+      if (existResponse) {await surveyRepository.updateResponse(surveyDTO);
       return ({
         ok: 1,
+        message: "Survey Update Success"
+      })} else {
+        await surveyRepository.CreateSurvey(surveyDTO);
+        return {
+        ok: 1,
         message: "Survey Response Success"
-      })}
-    catch(err) {
+        };
+      }
+    } catch(err) {
       throw err; 
     }
   }
+
+  // async surveyResponseInfo(surveyDTO: requestSurveyResponseDto) {
+  //   try {
+  //     const existResponse = await surveyRepository.findResponse(surveyDTO.userId)
+  //     if (existResponse) 
+  //   }
+  // }
   async updateUserInfo(updateDTO:updateUserDto) {
     try {
     
