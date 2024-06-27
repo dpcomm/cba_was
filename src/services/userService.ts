@@ -160,8 +160,6 @@ class UserService {
       throw err;
     }
   }
-  // async getUserInfo()
-
   async surveyResponseSave(surveyDTO:requestSurveyResponseDto) {
 
     try {
@@ -182,12 +180,16 @@ class UserService {
     }
   }
 
-  // async surveyResponseInfo(surveyDTO: requestSurveyResponseDto) {
-  //   try {
-  //     const existResponse = await surveyRepository.findResponse(surveyDTO.userId)
-  //     if (existResponse) 
-  //   }
-  // }
+  async surveyResponseInfo(userId:string) {
+    try {
+      const existResponse =  await surveyRepository.findResponse(userId)
+      if (existResponse) return ({
+        ok: 1,
+        message: "User SurveyData Exist",
+        existResponse
+      });
+    } catch(err) { throw err;}
+  }
   async updateUserInfo(updateDTO:updateUserDto) {
     try {
     
@@ -230,7 +232,7 @@ class UserService {
     }
     } catch (error) {
       console.error("Error in password check:",error);
-      return { ok:0, message: "An error occurred while checking the password."};
+      return { ok: 0, message: "An error occurred while checking the password."};
     }
   }
 }

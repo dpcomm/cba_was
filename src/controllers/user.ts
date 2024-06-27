@@ -5,6 +5,7 @@ import logger from '@utils/logger';
 
 import { requestSurveyResponseDto } from '@dtos/surveyDto';
 import SurveyRepository from '@repositories/surveyRepository';
+import AuthRepository from '@repositories/authRepository';
 
 const userService = new UserService();
 
@@ -177,13 +178,23 @@ class UserController {
       });
     }
   }
-  // async getResponse(req:Request, res:Response) {
-  //   try {
-  //     res.send(
-  //       SurveyRepository.findResponse
-  //     )
-  //   }
-  // }
+  async getResponse(req:Request, res:Response) {
+    try {
+      const userId: string = req.body.userId;
+      const surveyData: any = await userService.surveyResponseInfo(userId);
+      if (surveyData.ok) {
+        console.log(surveyData)
+        return res.status(200).json({
+          message : surveyData.message,
+          data : surveyData.existResponse
+        });
+      } 
+      else {return res.status(401).json({})}
+      
+    } catch (err: any) {
+      logger.error("getSurvey controller error:", err)
+    }
+  }
 }
 
 export default UserController;

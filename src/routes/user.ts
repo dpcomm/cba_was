@@ -14,7 +14,7 @@ userRouter.post('/logout', userController.logout);
 userRouter.post('/register', userController.register);
 userRouter.post('/refresh', userController.refreshAccessToken);
 userRouter.post('/survey', userController.surveyResponse);
-
+userRouter.post('/getExistSurvey', userController.getResponse);
 
 userRouter.get('/backoffice',admincontroller.UserTable);
 userRouter.post('/retreat-application',userController.surveyResponse);
