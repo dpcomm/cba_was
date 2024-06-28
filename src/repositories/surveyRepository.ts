@@ -19,7 +19,7 @@ class SurveyRepository {
                 userId: surveyDTO.userId,
                 idn: surveyDTO.idn,
                 surveyData: JSON.parse(JSON.stringify(surveyData)),
-                attended: true,
+                attended: false,
                 feePaid: false,
                 retreatId: 1
             }
