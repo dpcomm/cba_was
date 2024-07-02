@@ -12,7 +12,7 @@ const verifyAuth = async (req: Request, res: Response, next: NextFunction) => {
   }
 
   const tokenVerify = await jwtProvider.verifyAccessToken(token);
-  if (tokenVerify.message) {
+  if (tokenVerify.message === "jwt expired") {
     return res.status(401).json({
       message: tokenVerify.message
     });

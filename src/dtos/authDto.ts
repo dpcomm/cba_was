@@ -14,9 +14,9 @@ export interface requestRegisterUserDto {
   name: string,
   group: string,
   phone: string,
-  birth: string,
+  birth: Date,
   gender: string,
-  etcGroup?: string
+  rank: string,
 }
 
 export interface requestRefreshAccessTokenDto {
@@ -24,15 +24,18 @@ export interface requestRefreshAccessTokenDto {
   refreshToken: string,
 }
 
+export interface requestAuthCheckDto {
+  accessToken: string,
+}
 export interface updateUserDto {
   userId: string,
   password: string,
   name: string,
   group: string,
   phone: string,
-  birth: string,
+  birth: Date,
   gender: string
-  etcGroup?: string
+  rank: string,
 }
 
 export interface checkUserDto {

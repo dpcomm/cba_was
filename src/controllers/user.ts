@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import UserService from '@services/userService';
-import { checkUserDto,requestLoginUserDto, requestLogoutUserDto, requestRefreshAccessTokenDto, requestRegisterUserDto, updateUserDto } from '@dtos/authDto';
+import { requestAuthCheckDto, requestLoginUserDto, requestLogoutUserDto, requestRefreshAccessTokenDto, requestRegisterUserDto, checkUserDto, updateUserDto } from '@dtos/authDto';
 import logger from '@utils/logger';
 
 import { requestSurveyResponseDto } from '@dtos/surveyDto';
@@ -15,6 +15,7 @@ class UserController {
       const userDTO: requestLoginUserDto = req.body;
       const loginData: any = await userService.login(userDTO);
       if (loginData.ok) {
+        logger.http(`Login ${loginData.user.name} ${loginData.user.userId}`);
         return res.status(200).json({
           message: "Authorize success",
           accessToken: loginData.accessToken,
@@ -98,17 +99,22 @@ class UserController {
     }
   }
 
-  async getUser(req: Request, res: Response) {
-    console.log(req.body)
+  async authCheck(req: Request, res: Response) {
+    const userDTO: requestAuthCheckDto = req.body;
     try {
-      // const getUserId = req.user.id;
-      // const getUser = await userService.getUser(userDTO);
-      return res.json({
-
+      const authCheckData = await userService.authCheck(userDTO);
+      if (authCheckData.ok) {
+        return res.status(200).json({
+          message: authCheckData.message,
+          user: authCheckData.user,
+        })
+      }
+      return res.status(401).json({
+        message: authCheckData.message
       });
     } catch(err: any) {
-      logger.error("getUser controller error:", err);
-      return res.status(401).json({
+      logger.error("authCheck controller error:", err);
+      return res.status(500).json({
         message: err.message,
       })
     }
