@@ -7,7 +7,6 @@ export interface user {
   phone: string;
   birth: Date;
   gender: string;
-  role: string;
   createdAt: Date;
   updatedAt: Date;
 }
