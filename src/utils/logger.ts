@@ -43,6 +43,14 @@ const logger = winston.createLogger({
          maxFiles: 30,
          zippedArchive: true,
       }),
+      new winstonDaily({
+         level: 'http',
+         datePattern: 'YYYY-MM-DD',
+         dirname: logDir + '/http',
+         filename: `%DATE%.http.log`,
+         maxFiles: 30,
+         zippedArchive: true,
+      }),
    ],
    //* uncaughtException 발생시 파일 설정
    exceptionHandlers: [
@@ -61,8 +69,10 @@ const logger = winston.createLogger({
 if (process.env.NODE_ENV !== 'production') {
    logger.add(
       new winston.transports.Console({
+         level: 'http', // http 및 그 이상 레벨의 로그를 콘솔에 출력
          format: winston.format.combine(
             winston.format.colorize(), // 색깔 넣어서 출력
+            winston.format.printf(info => `(${info.timestamp}) [${info.label}] [${info.level}]: ${info.message}`) // 콘솔 출력 형식도 일관성 있게
          ),
       }),
    );

@@ -1,5 +1,5 @@
 import { user } from "@/types/default";
-import jwt, { JwtPayload } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 
 const secret = process.env.JWT_SECRET || 'default_secret';
 const expirentTime = process.env.JWT_EXPIRENTTIME || "1600";
@@ -63,7 +63,7 @@ class JwtProvider {
     try {
       decoded = await jwt.verify(token, secret)
       return {
-        id: decoded.id
+        id: decoded.id,
       }
     } catch (err: any) {
       return {

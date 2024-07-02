@@ -22,3 +22,7 @@ export interface requestRefreshAccessTokenDto {
   accessToken: string,
   refreshToken: string,
 }
+
+export interface requestAuthCheckDto {
+  accessToken: string,
+}

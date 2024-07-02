@@ -1,4 +1,4 @@
-import { requestLoginUserDto, requestLogoutUserDto, requestRefreshAccessTokenDto, requestRegisterUserDto } from "@dtos/authDto";
+import { requestAuthCheckDto, requestLoginUserDto, requestLogoutUserDto, requestRefreshAccessTokenDto, requestRegisterUserDto } from "@dtos/authDto";
 import bcrypt from "bcrypt";
 import AuthRepository from "@repositories/authRepository";
 import { user } from "@/types/default";
@@ -13,7 +13,6 @@ class UserService {
   async login(userDTO: requestLoginUserDto) {
     try {
       const user: user | null = await authRepository.findUser(userDTO.userId);
-      console.log("hello");
       if (!user) {
         return ({
           ok: 0,
@@ -114,14 +113,6 @@ class UserService {
   }
   async refreshAccessToken(userDTO: requestRefreshAccessTokenDto) {
     try {
-      const verifyAccessTokenResult = await jwtProvider.verifyAccessToken(userDTO.accessToken);
-      if (verifyAccessTokenResult.message !== "jwt expired") {
-        return ({
-          ok: 0,
-          message: "Token has not expired"
-        });
-      }
-
       const decodedAccessToken: any = await decode(userDTO.accessToken);
       const refreshToken: any = await redisClient.get(String(decodedAccessToken.id));
       if (userDTO.refreshToken !== refreshToken) {
@@ -150,6 +141,25 @@ class UserService {
         ok: 1,
         message: "Token reissue success",
         accessToken,
+      });
+    } catch(err) {
+      throw err;
+    }
+  }
+  async authCheck(userDTO: requestAuthCheckDto) {
+    try {
+      const decodedAccessToken: any = await decode(userDTO.accessToken);
+      if (!decodedAccessToken) {
+        return ({
+          ok: 1,
+          message: "Unauthorized user"
+        })
+      }
+      const user: user | null = await authRepository.findUser(String(decodedAccessToken.id));
+      return ({
+        ok: 1,
+        message: "Authorized user",
+        user
       });
     } catch(err) {
       throw err;

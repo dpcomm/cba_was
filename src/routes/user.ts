@@ -1,10 +1,11 @@
 import UserController from "@controllers/user";
+import verifyAuth from "@middlewares/verifyAuth";
 import express from "express";
 
 const userRouter = express.Router();
 const userController = new UserController();
 
-userRouter.get('/', userController.getUser);
+userRouter.post('/', verifyAuth, userController.authCheck);
 userRouter.post('/login', userController.login);
 userRouter.post('/logout', userController.logout);
 userRouter.post('/register', userController.register);
