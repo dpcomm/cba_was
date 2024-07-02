@@ -103,7 +103,7 @@ class UserService {
           message: "Password pattern unfulfilled"
         });
       }
-      
+
       const salt = bcrypt.genSaltSync(10);
       const hash = bcrypt.hashSync(userDTO.password, salt);
 

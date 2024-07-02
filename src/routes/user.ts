@@ -1,9 +1,7 @@
 import UserController from "@controllers/user";
-import verifyAuth from "@middlewares/verifyAuth";
-import express from "express";
-
 import AdminController from "@controllers/admin";
 import verifyAuth from "@middlewares/verifyAuth";
+import express from "express";
 
 const userRouter = express.Router();
 const userController = new UserController();
