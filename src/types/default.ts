@@ -7,6 +7,7 @@ export interface user {
   phone: string;
   birth: Date;
   gender: string;
+  rank: string;
   createdAt: Date;
   updatedAt: Date;
 }
