@@ -1,20 +1,22 @@
-import { requestRegisterUserDto } from '@dtos/authDto';
+import { requestRegisterUserDto, updateUserDto } from '@dtos/authDto';
 import { PrismaClient } from '@prisma/client'
+import UserService from '@services/userService';
 
 const prisma = new PrismaClient()
 
 class AuthRepository {
   async createUser(userDTO: requestRegisterUserDto, hash: string) {
+    const groupValue = userDTO.group === "기타" ? userDTO.etcGroup || userDTO.group : userDTO.group;
     return await prisma.user.create({
       data: {
         userId: userDTO.userId,
         password: hash,
         name: userDTO.name,
-        group: userDTO.group,
+        group: groupValue,
         phone: userDTO.phone,
         birth: new Date(userDTO.birth),
         gender: userDTO.gender,
-        role: "M"
+        rank: "M"
       }
     });
   }
@@ -25,6 +27,22 @@ class AuthRepository {
       }
     });
   }
+  async updateUser(updateDTO: updateUserDto, hash: string) {
+    const groupValue = updateDTO.group === "기타" ? updateDTO.etcGroup || updateDTO.group : updateDTO.group;
+    
+    return await prisma.user.update({
+      where: {userId: updateDTO.userId},
+      data: {
+        name: updateDTO.name,
+        password: hash,
+        group: groupValue,
+        phone: updateDTO.phone,
+        birth: new Date(updateDTO.birth),
+        gender: updateDTO.gender
+      },
+    });
+  }
 }
+
 
 export default AuthRepository;
