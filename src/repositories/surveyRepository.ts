@@ -1,4 +1,4 @@
-import { requestSurveyResponseDto } from '@dtos/surveyDto';
+import { requestApplicationResponseDto, requestSurveyResponseDto } from '@dtos/surveyDto';
 import { Prisma, PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient()
@@ -62,6 +62,12 @@ class SurveyRepository {
             },
         })
     }
+	async findApplicationByUserId(applicationDto: requestApplicationResponseDto) {
+        console.log(applicationDto.userId);
+		return await prisma.application.findUnique({
+			where: { userId: "profitia" },
+		});
+	}
 }
 
 export default SurveyRepository;

@@ -17,6 +17,7 @@ app.use(cors());
 app.use(bodyParser.json());
 
 app.use("/api/user", userRouter);
+// app.use("/api/application");
 
 app.listen(process.env.SERVER_PORT, () => {
 	logger.info(`Server app listening on port ${process.env.SERVER_PORT}`);
