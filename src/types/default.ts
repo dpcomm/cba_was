@@ -1,3 +1,5 @@
+import { JsonValue } from "@prisma/client/runtime/library";
+
 export interface user {
   id: number;
   userId: string;
@@ -10,4 +12,16 @@ export interface user {
   rank: string;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface application {
+  id: number;
+  idn: string;
+  surveyData: JsonValue;
+  attended: boolean;
+  feePaid: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  userId: string;
+  retreatId: number;
 }
