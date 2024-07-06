@@ -5,6 +5,7 @@ import bodyParser from "body-parser";
 import userRouter from "@routes/user";
 import logger from "@utils/logger";
 import redisClient from "@utils/redis";
+import applicationRouter from "@routes/application";
 
 dotenv.config();
 const app = express();
@@ -17,6 +18,7 @@ app.use(cors());
 app.use(bodyParser.json());
 
 app.use("/api/user", userRouter);
+app.use("/api/application", applicationRouter);
 // app.use("/api/application");
 
 app.listen(process.env.SERVER_PORT, () => {
