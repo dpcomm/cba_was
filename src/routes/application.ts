@@ -5,7 +5,7 @@ import ApplicationController from "@controllers/applicationController";
 const applicationRouter = express.Router();
 const applicationController = new ApplicationController();
 
-applicationRouter.get('/', verifyAuth, applicationController.getApplicationByUserId);
+applicationRouter.get('/:user', applicationController.getApplicationByUserId);
 applicationRouter.post('/', verifyAuth, applicationController.getApplicationByUserId);
 
 /*

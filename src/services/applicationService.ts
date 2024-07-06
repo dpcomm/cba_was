@@ -5,10 +5,9 @@ import { requestApplicationResponseDto } from "@dtos/surveyDto";
 const surveyRepository = new SurveyRepository();
 
 class ApplicationService {
-  async getApplicationByUserId(applicationDto: requestApplicationResponseDto) {
+  async getApplicationByUserId(userId: string) {
     try {
-      console.log(applicationDto);
-      const application: application | null = await surveyRepository.findApplicationByUserId(applicationDto);
+      const application: application | null = await surveyRepository.findApplicationByUserId(userId);
       if (!application) {
         return ({
           ok: 0,

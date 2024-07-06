@@ -62,10 +62,9 @@ class SurveyRepository {
             },
         })
     }
-	async findApplicationByUserId(applicationDto: requestApplicationResponseDto) {
-        console.log(applicationDto.userId);
+	async findApplicationByUserId(userId: string) {
 		return await prisma.application.findUnique({
-			where: { userId: "profitia" },
+			where: { userId: userId },
 		});
 	}
 }
