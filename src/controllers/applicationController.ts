@@ -3,6 +3,7 @@ import logger from '@utils/logger';
 import ApplicationService from '@services/applicationService';
 import { requestApplicationDto } from '@dtos/surveyDto';
 
+
 const applicationService = new ApplicationService();
 
 class ApplicationController {
