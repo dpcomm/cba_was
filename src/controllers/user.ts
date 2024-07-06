@@ -1,11 +1,10 @@
 import { Request, Response } from 'express';
 import UserService from '@services/userService';
-import { requestAuthCheckDto, requestLoginUserDto, requestLogoutUserDto, requestRefreshAccessTokenDto, requestRegisterUserDto, checkUserDto, updateUserDto } from '@dtos/authDto';
+import { requestAuthCheckDto, requestLoginUserDto, 
+  requestLogoutUserDto, requestRefreshAccessTokenDto, 
+  requestRegisterUserDto, checkUserDto, updateUserDto } from '@dtos/authDto';
 import logger from '@utils/logger';
 
-import { requestSurveyResponseDto } from '@dtos/surveyDto';
-import SurveyRepository from '@repositories/surveyRepository';
-import AuthRepository from '@repositories/authRepository';
 
 const userService = new UserService();
 
@@ -161,45 +160,6 @@ class UserController {
             err: err
           });
         }
-  }
-  async surveyResponse(req:Request,res:Response) {
-    try {
-      const surveyDto: requestSurveyResponseDto = req.body;
-      console.log(surveyDto);
-      const surveyData = await userService.surveyResponseSave(surveyDto);
-      if (surveyData.ok) {
-        console.log(surveyDto);
-        return res.status(200).json({
-          message: "Survey Register Success"
-        });
-      }
-      return res.status(401).json({
-        message: surveyData.message
-      });
-    } catch(err: any) {
-      logger.error("Survey controller error:", err);
-      return res.status(500).json({
-        message: err.message,
-        err: err
-      });
-    }
-  }
-  async getResponse(req:Request, res:Response) {
-    try {
-      const userId: string = req.body.userId;
-      const surveyData: any = await userService.surveyResponseInfo(userId);
-      if (surveyData.ok) {
-        console.log(surveyData)
-        return res.status(200).json({
-          message : surveyData.message,
-          data : surveyData.existResponse
-        });
-      } 
-      else {return res.status(401).json({})}
-      
-    } catch (err: any) {
-      logger.error("getSurvey controller error:", err)
-    }
   }
 }
 

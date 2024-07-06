@@ -6,13 +6,9 @@ import JwtProvider from "@utils/jwtProvider";
 import redisClient from "@utils/redis";
 import { decode } from "jsonwebtoken";
 
-import { requestSurveyResponseDto } from "@dtos/surveyDto";
-import SurveyRepository from "@repositories/surveyRepository";
-
 const authRepository = new AuthRepository();
 const jwtProvider = new JwtProvider();
 
-const surveyRepository = new SurveyRepository();
 
 class UserService {
   async login(userDTO: requestLoginUserDto) {
@@ -170,36 +166,6 @@ class UserService {
     } catch(err) {
       throw err;
     }
-  }
-  async surveyResponseSave(surveyDTO:requestSurveyResponseDto) {
-
-    try {
-      const existResponse = await surveyRepository.findResponse(surveyDTO.userId)
-      if (existResponse) {await surveyRepository.updateResponse(surveyDTO);
-      return ({
-        ok: 1,
-        message: "Survey Update Success"
-      })} else {
-        await surveyRepository.CreateSurvey(surveyDTO);
-        return {
-        ok: 1,
-        message: "Survey Response Success"
-        };
-      }
-    } catch(err) {
-      throw err; 
-    }
-  }
-
-  async surveyResponseInfo(userId:string) {
-    try {
-      const existResponse =  await surveyRepository.findResponse(userId)
-      if (existResponse) return ({
-        ok: 1,
-        message: "User SurveyData Exist",
-        existResponse
-      });
-    } catch(err) { throw err;}
   }
   async updateUserInfo(updateDTO:updateUserDto) {
     try {

@@ -16,7 +16,6 @@ export interface user {
 
 export interface application {
   id: number;
-  idn: string;
   surveyData: JsonValue;
   attended: boolean;
   feePaid: boolean;

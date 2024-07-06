@@ -6,7 +6,7 @@ const applicationRouter = express.Router();
 const applicationController = new ApplicationController();
 
 applicationRouter.get('/:user', applicationController.getApplicationByUserId);
-applicationRouter.post('/', verifyAuth, applicationController.getApplicationByUserId);
+applicationRouter.post('/', verifyAuth, applicationController.postApplication);
 
 /*
 /api/application POST 요청 시,
