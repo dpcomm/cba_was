@@ -30,14 +30,12 @@ export interface requestAuthCheckDto {
 }
 export interface updateUserDto {
   userId: string,
-  password: string,
+  // password: string,
   name: string,
   group: string,
   phone: string,
   birth: Date,
-  gender: string
-  rank: string,
-  etcGroup?: string
+  gender: string,
 
 }
 

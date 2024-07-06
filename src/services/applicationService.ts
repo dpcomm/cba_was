@@ -1,14 +1,13 @@
 import SurveyRepository from "@repositories/surveyRepository";
 import { application } from "@/types/default";
-import { requestApplicationResponseDto } from "@dtos/surveyDto";
+import { requestApplicationDto,SurveyFormatDto } from "@dtos/surveyDto";
 
 const surveyRepository = new SurveyRepository();
 
 class ApplicationService {
-  async getApplicationByUserId(applicationDto: requestApplicationResponseDto) {
+  async getApplicationByUserId(userId: string) {
     try {
-      console.log(applicationDto);
-      const application: application | null = await surveyRepository.findApplicationByUserId(applicationDto);
+      const application: application | null = await surveyRepository.findApplicationByUserId(userId);
       if (!application) {
         return ({
           ok: 0,
@@ -21,6 +20,37 @@ class ApplicationService {
         application
       });
     } catch(err) {
+      throw err;
+    }
+  }
+  async addApplication(surveyDTO: requestApplicationDto) {
+    try {
+      if (!surveyDTO) {
+        return ({
+          ok:0,
+          message: "Invalid request"
+        });
+      }
+      await surveyRepository.createApplication(surveyDTO);
+      return {
+        ok: 1,
+        message: "Survey Response Success"
+      };
+    } catch(err) {
+      throw err;
+    }
+  }
+  async updateApplication(surveyDTO: requestApplicationDto) {
+    try {
+      const application: application | null = await surveyRepository.findApplicationByUserId(surveyDTO.userId);
+      if (application) {
+        await surveyRepository.updateApplication(surveyDTO);
+        return {
+          ok: 1,
+          message: "Survey Update Success"
+        };
+      }
+    } catch (err) {
       throw err;
     }
   }
