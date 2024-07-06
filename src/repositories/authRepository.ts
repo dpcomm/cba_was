@@ -28,13 +28,12 @@ class AuthRepository {
     });
   }
   async updateUser(updateDTO: updateUserDto, hash: string) {
-    const groupValue = updateDTO.group === "기타" ? updateDTO.etcGroup || updateDTO.group : updateDTO.group;
     return await prisma.user.update({
       where: {userId: updateDTO.userId},
       data: {
         name: updateDTO.name,
         password: hash,
-        group: groupValue,
+        group: updateDTO.group,
         phone: updateDTO.phone,
         birth: new Date(updateDTO.birth),
         gender: updateDTO.gender

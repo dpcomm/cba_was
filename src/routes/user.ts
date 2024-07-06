@@ -14,7 +14,7 @@ userRouter.post('/register', userController.register);
 userRouter.post('/refresh', userController.refreshAccessToken);
 
 userRouter.get('/backoffice',admincontroller.UserTable);
-userRouter.post('/updateUser',userController.updateUser);
+userRouter.post('/update',userController.updateUser);
 userRouter.post('/checkuser',verifyAuth,userController.checkUser);
 
 export default userRouter;

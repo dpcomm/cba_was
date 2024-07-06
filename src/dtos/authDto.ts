@@ -35,9 +35,7 @@ export interface updateUserDto {
   group: string,
   phone: string,
   birth: Date,
-  gender: string
-  rank: string,
-  etcGroup?: string
+  gender: string,
 
 }
 
