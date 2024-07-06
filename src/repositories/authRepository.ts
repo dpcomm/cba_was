@@ -27,12 +27,12 @@ class AuthRepository {
       }
     });
   }
-  async updateUser(updateDTO: updateUserDto, hash: string) {
+  async updateUser(updateDTO: updateUserDto) {
     return await prisma.user.update({
       where: {userId: updateDTO.userId},
       data: {
         name: updateDTO.name,
-        password: hash,
+        // password: hash,
         group: updateDTO.group,
         phone: updateDTO.phone,
         birth: new Date(updateDTO.birth),

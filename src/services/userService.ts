@@ -170,17 +170,17 @@ class UserService {
   async updateUserInfo(updateDTO:updateUserDto) {
     try {
     
-      const passwordPattern = /^(?=.*[a-zA-Z])(?=.*\d).{10,}$/;
-      if (!passwordPattern.test(updateDTO.password)) {
-        return ({
-          ok: 0,
-          message: "Password pattern unfulfilled"
-        });
-      }
-      const salt = bcrypt.genSaltSync(10);
-      const hash = bcrypt.hashSync(updateDTO.password, salt);
-
-      await authRepository.updateUser(updateDTO,hash);
+      // const passwordPattern = /^(?=.*[a-zA-Z])(?=.*\d).{10,}$/;
+      // if (!passwordPattern.test(updateDTO.password)) {
+      //   return ({
+      //     ok: 0,
+      //     message: "Password pattern unfulfilled"
+      //   });
+      // }
+      // const salt = bcrypt.genSaltSync(10);
+      // const hash = bcrypt.hashSync(updateDTO.password, salt);
+      // await authRepository.updateUser(updateDTO,hash);
+      await authRepository.updateUser(updateDTO);
       return ({
         ok: 1,
         message: "Update User Success"
