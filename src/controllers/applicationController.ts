@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import logger from '@utils/logger';
 
 import { requestApplicationResponseDto } from '@dtos/surveyDto';
-import ApplicationService from '@services/ApplicationService';
+import ApplicationService from '@services/applicationService';
 
 const applicationService = new ApplicationService();
 
