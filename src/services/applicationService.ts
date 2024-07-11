@@ -1,6 +1,6 @@
-import SurveyRepository from "@repositories/surveyRepository";
+import SurveyRepository from "@repositories/applicationRepository";
 import { application } from "@/types/default";
-import { requestApplicationDto,SurveyFormatDto } from "@dtos/surveyDto";
+import { requestApplicationDto } from "@dtos/surveyDto";
 
 const surveyRepository = new SurveyRepository();
 
