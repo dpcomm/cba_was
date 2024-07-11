@@ -4,7 +4,7 @@ import UserService from '@services/userService';
 
 const prisma = new PrismaClient()
 
-class AuthRepository {
+class UserRepository {
   async createUser(userDTO: requestRegisterUserDto, hash: string) {
     const groupValue = userDTO.group === "기타" ? userDTO.etcGroup || userDTO.group : userDTO.group;
     return await prisma.user.create({
@@ -20,12 +20,15 @@ class AuthRepository {
       }
     });
   }
-  async findUser(userId: string) {
+  async findUserByUserId(userId: string) {
     return await prisma.user.findUnique({
       where: {
         userId: userId
       }
     });
+  }
+  async findUser() {
+    return await prisma.user.findMany();
   }
   async updateUser(updateDTO: updateUserDto) {
     return await prisma.user.update({
@@ -43,4 +46,4 @@ class AuthRepository {
 }
 
 
-export default AuthRepository;
+export default UserRepository;

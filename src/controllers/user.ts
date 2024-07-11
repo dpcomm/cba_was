@@ -1,8 +1,14 @@
 import { Request, Response } from 'express';
 import UserService from '@services/userService';
-import { requestAuthCheckDto, requestLoginUserDto, 
-  requestLogoutUserDto, requestRefreshAccessTokenDto, 
-  requestRegisterUserDto, checkUserDto, updateUserDto } from '@dtos/authDto';
+import {
+  requestAuthCheckDto,
+  requestLoginUserDto,
+  requestLogoutUserDto,
+  requestRefreshAccessTokenDto,
+  requestRegisterUserDto,
+  checkUserDto,
+  updateUserDto
+} from '@dtos/authDto';
 import logger from '@utils/logger';
 
 
@@ -46,7 +52,7 @@ class UserController {
       return res.status(401).json({
         message: "Logout failed"
       });
-    } catch(err: any) {
+    } catch (err: any) {
       logger.error("logout controller error:", err);
       return res.status(500).json({
         message: err.message,
@@ -67,7 +73,7 @@ class UserController {
       return res.status(401).json({
         message: registerData.message
       });
-    } catch(err: any) {
+    } catch (err: any) {
       logger.error("Register controller error:", err);
       return res.status(500).json({
         message: err.message,
@@ -89,8 +95,42 @@ class UserController {
       return res.status(401).json({
         message: refreshAccessTokenData.message
       });
-    } catch(err: any) {
+    } catch (err: any) {
       logger.error("refreshAccessToken controller error:", err);
+      return res.status(500).json({
+        message: err.message,
+        err: err
+      });
+    }
+  }
+
+  async getUser(req: Request, res: Response) {
+    try {
+      const userId: string = req.params['user'];
+      if (userId) {
+        const getUserByUserIdData = await userService.getUserByUserId(userId);
+        if (getUserByUserIdData.ok) {
+          return res.status(200).json({
+            message: getUserByUserIdData.message,
+            user: getUserByUserIdData.user
+          });
+        }
+        return res.status(401).json({
+          message: getUserByUserIdData.message,
+        });
+      }
+      const getAllUserData = await userService.getAllUser();
+      if (getAllUserData.ok) {
+        return res.status(200).json({
+          message: getAllUserData.message,
+          user: getAllUserData.user
+        });
+      }
+      return res.status(401).json({
+        message: getAllUserData.message,
+      });
+    } catch (err: any) {
+      logger.error("getUser controller error:", err);
       return res.status(500).json({
         message: err.message,
         err: err
@@ -111,7 +151,7 @@ class UserController {
       return res.status(401).json({
         message: authCheckData.message
       });
-    } catch(err: any) {
+    } catch (err: any) {
       logger.error("authCheck controller error:", err);
       return res.status(500).json({
         message: err.message,
@@ -132,7 +172,7 @@ class UserController {
       return res.status(401).json({
         message: updateData.message
       });
-    } catch(err: any) {
+    } catch (err: any) {
       logger.error("Update controller error:", err);
       return res.status(500).json({
         message: err.message,
@@ -153,13 +193,13 @@ class UserController {
       return res.status(401).json({
         message: checkData.message
       });
-        } catch(err: any) {
-          logger.error("checkUser controller error:", err);
-          return res.status(500).json({
-            message: err.message,
-            err: err
-          });
-        }
+    } catch (err: any) {
+      logger.error("checkUser controller error:", err);
+      return res.status(500).json({
+        message: err.message,
+        err: err
+      });
+    }
   }
 }
 

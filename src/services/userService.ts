@@ -1,19 +1,20 @@
 import { requestAuthCheckDto, requestLoginUserDto, requestLogoutUserDto, requestRefreshAccessTokenDto, requestRegisterUserDto, checkUserDto, updateUserDto } from "@dtos/authDto";
 import bcrypt from "bcrypt";
-import AuthRepository from "@repositories/authRepository";
 import { user } from "@/types/default";
+import UserRepository from "@repositories/userRepository";
 import JwtProvider from "@utils/jwtProvider";
 import redisClient from "@utils/redis";
 import { decode } from "jsonwebtoken";
 
-const authRepository = new AuthRepository();
+
+const userRepository = new UserRepository();
 const jwtProvider = new JwtProvider();
 
 
 class UserService {
   async login(userDTO: requestLoginUserDto) {
     try {
-      const user: user | null = await authRepository.findUser(userDTO.userId);
+      const user: user | null = await userRepository.findUserByUserId(userDTO.userId);
       if (!user) {
         return ({
           ok: 0,
@@ -77,7 +78,7 @@ class UserService {
   }
   async register(userDTO: requestRegisterUserDto) {
     try {
-      const user: user | null = await authRepository.findUser(userDTO.userId);
+      const user: user | null = await userRepository.findUserByUserId(userDTO.userId);
       const passwordPattern = /^(?=.*[a-zA-Z])(?=.*\d).{10,}$/;
 
       if (user) {
@@ -103,7 +104,7 @@ class UserService {
       const salt = bcrypt.genSaltSync(10);
       const hash = bcrypt.hashSync(userDTO.password, salt);
 
-      await authRepository.createUser(userDTO, hash);
+      await userRepository.createUser(userDTO, hash);
 
       return ({
         ok: 1,
@@ -157,7 +158,7 @@ class UserService {
           message: "Unauthorized user"
         })
       }
-      const user: user | null = await authRepository.findUser(String(decodedAccessToken.id));
+      const user: user | null = await userRepository.findUserByUserId(String(decodedAccessToken.id));
       return ({
         ok: 1,
         message: "Authorized user",
@@ -179,8 +180,8 @@ class UserService {
       // }
       // const salt = bcrypt.genSaltSync(10);
       // const hash = bcrypt.hashSync(updateDTO.password, salt);
-      // await authRepository.updateUser(updateDTO,hash);
-      await authRepository.updateUser(updateDTO);
+      // await userRepository.updateUser(updateDTO,hash);
+      await userRepository.updateUser(updateDTO);
       return ({
         ok: 1,
         message: "Update User Success"
@@ -191,7 +192,7 @@ class UserService {
   }
   async checkUserInfo (checkuser:checkUserDto) {
     try {
-      const currentData = await authRepository.findUser(checkuser.userId);
+      const currentData = await userRepository.findUserByUserId(checkuser.userId);
       const currentHash = currentData?.password ?? ""; //currentData가 null(undefined) & currentData.password도 null(undefined)일때 "" 반환 
 
       const passwordPattern = /^(?=.*[a-zA-Z])(?=.*\d).{10,}$/;
@@ -210,6 +211,42 @@ class UserService {
     } catch (error) {
       console.error("Error in password check:",error);
       return { ok: 0, message: "An error occurred while checking the password."};
+    }
+  }
+  async getUserByUserId (userId: string) {
+    try {
+      const user: user | null = await userRepository.findUserByUserId(userId);
+      if (!user) {
+        return ({
+          ok: 0,
+          message: "User not exist"
+        });
+      }
+      return ({
+        ok: 1,
+        message: "getUserByUserId success",
+        user
+      });
+    } catch (err) {
+      throw err;
+    }
+  }
+  async getAllUser () {
+    try {
+      const user: user[] | null = await userRepository.findUser();
+      if (!user) {
+        return ({
+          ok: 0,
+          message: "User not exist"
+        });
+      }
+      return ({
+        ok: 1,
+        message: "getAllUser success",
+        user
+      });
+    } catch (err) {
+      throw err;
     }
   }
 }
