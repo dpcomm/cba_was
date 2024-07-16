@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import logger from '@utils/logger';
 import ApplicationService from '@services/applicationService';
-import { requestApplicationDto } from '@dtos/surveyDto';
+import { EditApplicationAttendedAndFeePaidDtoType, requestApplicationDto } from '@dtos/surveyDto';
 
 const applicationService = new ApplicationService();
 
@@ -22,6 +22,48 @@ class ApplicationController {
       });
     } catch (err: any) {
       logger.error("Application controller error:", err)
+      return res.status(500).json({
+        message: err.message,
+        err: err
+      });
+    }
+  }
+  async getApplication(req: Request, res: Response) {
+    try {
+      const getAllApplicationData = await applicationService.getAllApplication()
+      if (getAllApplicationData.ok) {
+        return res.status(200).json({
+          message: getAllApplicationData.message,
+          application: getAllApplicationData.application
+        });
+      }
+      return res.status(401).json({
+        message: getAllApplicationData.message,
+      });
+    } catch (err: any) {
+      logger.error("Application controller error:", err)
+      return res.status(500).json({
+        message: err.message,
+        err: err
+      });
+    }
+  }
+  async EditApplicationAttendedAndFeePaid(req: Request, res: Response) {
+    const applicationDto: EditApplicationAttendedAndFeePaidDtoType = req.body;
+    console.log(applicationDto);
+    try {
+      const editApplicationAttendedAndFeePaidData: any = await applicationService.updateApplicationAttendedAndFeePaid(applicationDto);
+      if (editApplicationAttendedAndFeePaidData.ok) {
+        return res.status(200).json({
+          message: editApplicationAttendedAndFeePaidData
+        });
+
+      }
+      return res.status(401).json({
+        message: editApplicationAttendedAndFeePaidData.message
+      });
+    } catch(err: any) {
+      logger.error("Application controller error:", err);
       return res.status(500).json({
         message: err.message,
         err: err
