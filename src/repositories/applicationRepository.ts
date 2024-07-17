@@ -24,14 +24,15 @@ class ApplicationRepository {
 				}
 			}
 		});
-
-		return applications.map((data: any) => ({
+		const hello = applications.map((data: any) => {return Object(applications[0].surveyData).transfer.transfer})
+		console.log(hello);
+		return applications.map((data: any, index: number) => ({
 			id: data.id,
 			attended: data.attended,
 			feePaid: data.feePaid,
-			transfer: Object(applications[0].surveyData).transfer.transfer,
-			ownCar: Object(applications[0].surveyData).transfer['own-car'],
-			bus: Object(applications[0].surveyData).transfer.bus,
+			transfer: Object(applications[index].surveyData).transfer.transfer,
+			ownCar: Object(applications[index].surveyData).transfer['own-car'],
+			bus: Object(applications[index].surveyData).transfer.bus,
 			name: data.user.name,
 			title: data.retreat.title
 		}));
