@@ -25,7 +25,7 @@ class ApplicationRepository {
 			}
 		});
 
-		return applications.map(data => ({
+		return applications.map((data: any) => ({
 			id: data.id,
 			attended: data.attended,
 			feePaid: data.feePaid,
