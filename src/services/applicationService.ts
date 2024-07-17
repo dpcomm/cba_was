@@ -1,13 +1,31 @@
-import SurveyRepository from "@repositories/applicationRepository";
+import ApplicationRepository from "@repositories/applicationRepository";
 import { application } from "@/types/default";
-import { requestApplicationDto } from "@dtos/surveyDto";
+import { EditApplicationAttendedAndFeePaidDtoType, requestApplicationDto } from "@dtos/surveyDto";
 
-const surveyRepository = new SurveyRepository();
+const applicationRepository = new ApplicationRepository();
 
 class ApplicationService {
+  async getAllApplication() {
+    try {
+      const application = await applicationRepository.findApplication();
+      if (!application) {
+        return ({
+          ok: 0,
+          message: "Application not exist"
+        });
+      }
+      return ({
+        ok: 1,
+        message: "getAllApplication success",
+        application
+      });
+    } catch(err) {
+      throw err;
+    }
+  }
   async getApplicationByUserId(userId: string) {
     try {
-      const application: application | null = await surveyRepository.findApplicationByUserId(userId);
+      const application: application | null = await applicationRepository.findApplicationByUserId(userId);
       if (!application) {
         return ({
           ok: 0,
@@ -31,7 +49,7 @@ class ApplicationService {
           message: "Invalid request"
         });
       }
-      await surveyRepository.createApplication(surveyDTO);
+      await applicationRepository.createApplication(surveyDTO);
       return {
         ok: 1,
         message: "Survey Response Success"
@@ -42,14 +60,25 @@ class ApplicationService {
   }
   async updateApplication(surveyDTO: requestApplicationDto) {
     try {
-      const application: application | null = await surveyRepository.findApplicationByUserId(surveyDTO.userId);
+      const application: application | null = await applicationRepository.findApplicationByUserId(surveyDTO.userId);
       if (application) {
-        await surveyRepository.updateApplication(surveyDTO);
+        await applicationRepository.updateApplication(surveyDTO);
         return {
           ok: 1,
           message: "Survey Update Success"
         };
       }
+    } catch (err) {
+      throw err;
+    }
+  }
+  async updateApplicationAttendedAndFeePaid(applicationDto: EditApplicationAttendedAndFeePaidDtoType) {
+    try {
+      await applicationRepository.updateApplicationAttendedAndFeePaid(applicationDto)
+      return ({
+        ok: 1,
+        message: "updateApplicationAttendedAndFeePaid Success"
+      })
     } catch (err) {
       throw err;
     }
