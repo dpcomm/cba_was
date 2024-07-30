@@ -22,17 +22,16 @@ pipeline {
                 sh "sudo docker-compose -f docker-compose.prod.yml build"
             }
         }
-        stage('migration') {
-            steps {
-                sh "docker exec cba_was npx prisma db push --schema=src/prisma/schema.prisma"
-            }
-        }
         stage('Deploy') {
             steps {
                 sh 'sudo docker-compose -f docker-compose.prod.yml up -d'
             }
         }
-
+        stage('migration') {
+            steps {
+                sh "docker exec cba_was npx prisma db push --schema=src/prisma/schema.prisma"
+            }
+        }
         stage('Finish') {
             steps{
                 sh 'sudo docker images -qf dangling=true | xargs -I{} docker rmi {}'
