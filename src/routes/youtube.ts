@@ -5,7 +5,7 @@ import verifyAuth from "@middlewares/verifyAuth";
 const youtubeRouter = express.Router();
 const youtubeController = new YoutubeController();
 
-youtubeRouter.get('/', youtubeController.getYoutube);
-youtubeRouter.post('/', youtubeController.createYoutube);
+youtubeRouter.get('/', verifyAuth, youtubeController.getYoutube);
+youtubeRouter.post('/', verifyAuth, youtubeController.createYoutube);
 
 export default youtubeRouter;
