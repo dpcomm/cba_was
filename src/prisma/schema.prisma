@@ -28,7 +28,7 @@ model Application {
   idn        String
   surveyData Json      //{"meal":{3x3array},"transfer":{"own-car":string,"bus":[1,1],transfer:"대형버스"}}
   attended   Boolean   @default(false)
-  feePaid    Boolean   @default(false) 
+  feePaid    Boolean   @default(false)
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
   userId     String    @unique
@@ -44,11 +44,14 @@ model Retreat {
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
   applications Application[]
+  youtubes Youtube[]
 }
 
 model Youtube {
   id        Int      @id @default(autoincrement())
-  link      String
+  retreatId  Int
+  title      String
+  link      String   @db.VarChar(255)
   createdAt DateTime @default(now())
+  retreat    Retreat   @relation(fields: [retreatId], references: [id])
 }
-
