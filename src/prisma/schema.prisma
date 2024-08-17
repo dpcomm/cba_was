@@ -21,6 +21,7 @@ model User {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   applications Application[]
+  prays      Pray[]
 }
 
 model Application {
@@ -54,4 +55,12 @@ model Youtube {
   link      String   @db.VarChar(255)
   createdAt DateTime @default(now())
   retreat    Retreat   @relation(fields: [retreatId], references: [id])
+}
+
+model Pray {
+  id         Int       @id @default(autoincrement())
+  content    String
+  createdAt  DateTime  @default(now())
+  userId     Int
+  user       User      @relation(fields: [userId], references: [id])
 }
