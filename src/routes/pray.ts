@@ -1,5 +1,5 @@
 import express from "express";
-import PrayController from "@controllers/prayController";
+import PrayController from "@controllers/prayController";
 import verifyAuth from "@middlewares/verifyAuth";
 
 const prayRouter = express.Router();
