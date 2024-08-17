@@ -20,7 +20,7 @@ class PrayRepository {
   async deletePray(id: number) {
     return await prisma.pray.delete({
       where: {
-        id,
+        id: id,
       },
     });
   }
