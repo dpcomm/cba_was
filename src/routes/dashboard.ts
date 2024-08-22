@@ -5,6 +5,6 @@ import DashboardController from "@controllers/dashboardController";
 const dashboardRouter = express.Router();
 const dashboardController = new DashboardController();
 
-dashboardRouter.get('/', dashboardController.getDashboard);
+dashboardRouter.get('/', verifyAuth, dashboardController.getDashboard);
 
 export default dashboardRouter;

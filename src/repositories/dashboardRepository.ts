@@ -10,9 +10,23 @@ class DashboardRepository {
                 userId: true,
             },
         });
-        const result = groupCounts.map((groupCount: { group: string, _count: { userId: number } }) => ({
-            group: groupCount.group,
-            count: groupCount._count.userId,
+
+        const allowedGroups = ['반일섭M', '노시은M', '권수영M', '대청2부'];
+        const groupMap: { [key: string]: number } = {};
+
+        groupCounts.forEach((groupCount) => {
+            const groupName = allowedGroups.includes(groupCount.group) ? groupCount.group : '기타';
+
+            if (groupMap[groupName]) {
+                groupMap[groupName] += groupCount._count.userId;
+            } else {
+                groupMap[groupName] = groupCount._count.userId;
+            }
+        });
+
+        const result = Object.keys(groupMap).map((group) => ({
+            group,
+            count: groupMap[group],
         }));
 
         return result;
