@@ -8,6 +8,7 @@ import redisClient from "@utils/redis";
 import applicationRouter from "@routes/application";
 import youtubeRouter from "@routes/youtube";
 import prayRouter from "@routes/pray";
+import dashboardRouter from "@routes/dashboard";
 
 dotenv.config();
 const app = express();
@@ -23,6 +24,7 @@ app.use("/api/user", userRouter);
 app.use("/api/application", applicationRouter);
 app.use("/api/youtube", youtubeRouter);
 app.use("/api/pray", prayRouter);
+app.use("/api/dashboard", dashboardRouter);
 
 app.listen(process.env.SERVER_PORT, () => {
 	logger.info(`Server app listening on port ${process.env.SERVER_PORT}`);
