@@ -12,7 +12,7 @@ class DashboardController {
         logger.http(`getAllYoutube`);
         return res.status(200).json({
           message: "Success request dashboard",
-          youtube: getDashboard.youtube
+          data: getDashboard.data
         });
       }
       return res.status(401).json({
