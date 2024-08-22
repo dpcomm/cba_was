@@ -11,25 +11,27 @@ class DashboardRepository {
             },
         });
 
-        const allowedGroups = ['반일섭M', '노시은M', '권수영M', '대청2부'];
-        const groupMap: { [key: string]: number } = {};
-
-        groupCounts.forEach((groupCount) => {
+        const result = groupCounts.map((groupCount: { group: string; _count: { userId: number } }) => {
+            const allowedGroups = ['반일섭M', '노시은M', '권수영M', '대청2부'];
             const groupName = allowedGroups.includes(groupCount.group) ? groupCount.group : '기타';
 
-            if (groupMap[groupName]) {
-                groupMap[groupName] += groupCount._count.userId;
-            } else {
-                groupMap[groupName] = groupCount._count.userId;
-            }
+            return {
+                group: groupName,
+                count: groupCount._count.userId,
+            };
         });
 
-        const result = Object.keys(groupMap).map((group) => ({
-            group,
-            count: groupMap[group],
-        }));
+        const groupedResult = result.reduce((acc, curr) => {
+            const existingGroup = acc.find(group => group.group === curr.group);
+            if (existingGroup) {
+                existingGroup.count += curr.count;
+            } else {
+                acc.push(curr);
+            }
+            return acc;
+        }, []);
 
-        return result;
+        return groupedResult;
     }
 
     async findAllRegistryMembers() {
