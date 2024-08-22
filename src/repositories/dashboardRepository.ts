@@ -6,13 +6,16 @@ class DashboardRepository {
     async findAllGroupMembers() {
         const groupCounts = await prisma.user.groupBy({
             by: ['group'],
-            _count: {userId: true,},
-          });
-        const result = groupCounts.map(groupCount => ({
+            _count: {
+                userId: true,
+            },
+        });
+        const result = groupCounts.map((groupCount: { group: string, _count: { userId: number } }) => ({
             group: groupCount.group,
             count: groupCount._count.userId,
-          }));
-          return result;
+        }));
+
+        return result;
     }
 
     async findAllRegistryMembers() {
@@ -21,13 +24,13 @@ class DashboardRepository {
 
     async findAllPaidMembers() {
         return await prisma.application.count({
-            where : {feePaid: true}
+            where: { feePaid: true },
         });
     }
 
     async findAllAtendMembers() {
         return await prisma.application.count({
-            where : {attended:true}
+            where: { attended: true },
         });
     }
 }
