@@ -2,6 +2,11 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
+interface GroupCount {
+    group: string;
+    count: number;
+}
+
 class DashboardRepository {
     async findAllGroupMembers() {
         const groupCounts = await prisma.user.groupBy({
@@ -11,18 +16,18 @@ class DashboardRepository {
             },
         });
 
-        const result = groupCounts.map((groupCount: { group: string; _count: { userId: number } }) => {
-            const allowedGroups = ['반일섭M', '노시은M', '권수영M', '대청2부'];
-            const groupName = allowedGroups.includes(groupCount.group) ? groupCount.group : '기타';
+        const allowedGroups = ['반일섭M', '노시은M', '권수영M', '대청2부'];
 
+        const result = groupCounts.map((groupCount: { group: string; _count: { userId: number } }): GroupCount => {
+            const groupName = allowedGroups.includes(groupCount.group) ? groupCount.group : '기타';
             return {
                 group: groupName,
                 count: groupCount._count.userId,
             };
         });
 
-        const groupedResult = result.reduce((acc, curr) => {
-            const existingGroup = acc.find(group => group.group === curr.group);
+        const groupedResult = result.reduce((acc: GroupCount[], curr: GroupCount): GroupCount[] => {
+            const existingGroup = acc.find((group: GroupCount) => group.group === curr.group);
             if (existingGroup) {
                 existingGroup.count += curr.count;
             } else {
