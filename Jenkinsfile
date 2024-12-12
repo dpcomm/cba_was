@@ -29,7 +29,7 @@ pipeline {
         }
         stage('migration') {
             steps {
-                sh "docker exec cba_was npx prisma db push --schema=src/prisma/schema.prisma"
+                sh "docker exec cba_was npx prisma db push --skip-generate --schema=src/prisma/schema.prisma"
             }
         }
         stage('Finish') {
