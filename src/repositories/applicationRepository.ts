@@ -24,8 +24,6 @@ class ApplicationRepository {
 				}
 			}
 		});
-		const hello = applications.map((data: any) => {return Object(applications[0].surveyData).transfer.transfer})
-		console.log(hello);
 		return applications.map((data: any, index: number) => ({
 			id: data.id,
 			attended: data.attended,
@@ -33,18 +31,20 @@ class ApplicationRepository {
 			transfer: Object(applications[index].surveyData).transfer.transfer,
 			ownCar: Object(applications[index].surveyData).transfer['own-car'],
 			bus: Object(applications[index].surveyData).transfer.bus,
+			isLeader: Object(applications[index].surveyData).isLeader,
 			name: data.user.name,
 			title: data.retreat.title
 		}));
 	}
 	async createApplication(surveyDTO: requestApplicationDto) {
 		const surveyData = {
-			'meal':surveyDTO.meal,
+			'meal': surveyDTO.meal,
 			'transfer': {
-				'transfer':surveyDTO.transfer,
-				'own-car':surveyDTO.carId,
-				'bus':surveyDTO.bus
-			}
+				'transfer': surveyDTO.transfer,
+				'own-car': surveyDTO.carId,
+				'bus': surveyDTO.bus
+			},
+			"isLeader": surveyDTO.isLeader
 		}
 		return await prisma.application.create({
 			data : {
@@ -53,19 +53,20 @@ class ApplicationRepository {
 				surveyData: JSON.parse(JSON.stringify(surveyData)),
 				attended: false,
 				feePaid: false,
-				retreatId: 1
+				retreatId: surveyDTO.retreatId
 			}
 		});
 	}
 
 	async updateApplication(surveyDTO: requestApplicationDto) {
 		const surveyData = {
-			'meal':surveyDTO.meal,
+			'meal': surveyDTO.meal,
 			'transfer': {
-				'transfer':surveyDTO.transfer,
-				'own-car':surveyDTO.carId,
-				'bus':surveyDTO.bus
-			}
+				'transfer': surveyDTO.transfer,
+				'own-car': surveyDTO.carId,
+				'bus': surveyDTO.bus
+			},
+			"isLeader": surveyDTO.isLeader
 		}
 		return await prisma.application.update({
 			where: { userId: surveyDTO.userId },
@@ -76,9 +77,9 @@ class ApplicationRepository {
 			},
 		});
 	}
-	async findApplicationByUserId(userId: string) {
+	async findApplicationByUserIdAndRetreatId(userId: string, retreatId: number) {
 		return await prisma.application.findUnique({
-			where: { userId: userId },
+			where: { userId: userId, retreatId: retreatId },
 		});
 	}
 	async updateApplicationAttendedAndFeePaid(applicationDto: EditApplicationAttendedAndFeePaidDtoType) {

@@ -1,9 +1,11 @@
 export interface requestApplicationDto {
     userId: string,
-    transfer: string,
-    meal:number[][], //JSON type 변환은 JSON.parse를 통해
+    retreatId: number,
+    transfer?: string,
+    meal?:number[][], //JSON type 변환은 JSON.parse를 통해
     bus?: number[],
-    carId?: string
+    carId?: string,
+    isLeader?: boolean,
 }
 
 
