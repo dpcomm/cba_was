@@ -6,19 +6,20 @@ import { EditApplicationAttendedAndFeePaidDtoType, requestApplicationDto } from 
 const applicationService = new ApplicationService();
 
 class ApplicationController {
-  async getApplicationByUserId(req: Request, res: Response) {
+  async getApplicationByUserIdAndRetreatId(req: Request, res: Response) {
     try {
       const userId: string = req.params['user'];
-      const getApplicationByUserIdData: any = await applicationService.getApplicationByUserId(userId);
-      if (getApplicationByUserIdData.ok) {
-        logger.http(`getApplicationByUserId ${getApplicationByUserIdData.application.userId}`);
+      const retreatId: number = parseInt(req.params['retreatid']);
+      const getApplicationByUserIdAndRetreatIdData: any = await applicationService.getApplicationByUserIdAndRetreatId(userId, retreatId);
+      if (getApplicationByUserIdAndRetreatIdData.ok) {
+        logger.http(`getApplicationByUserIdAndRetreatId ${getApplicationByUserIdAndRetreatIdData.application.userId}`);
         return res.status(200).json({
           message: "Success request application by userId",
-          application: getApplicationByUserIdData.application
+          application: getApplicationByUserIdAndRetreatIdData.application
         });
       }
       return res.status(401).json({
-        message: getApplicationByUserIdData.message,
+        message: getApplicationByUserIdAndRetreatIdData.message,
       });
     } catch (err: any) {
       logger.error("Application controller error:", err)
@@ -73,7 +74,7 @@ class ApplicationController {
   async postApplication(req: Request, res: Response) {
     try {
       const surveyDto: requestApplicationDto = req.body;
-      const getApplicationByUserIdData: any = await applicationService.getApplicationByUserId(surveyDto.userId);
+      const getApplicationByUserIdData: any = await applicationService.getApplicationByUserIdAndRetreatId(surveyDto.userId, surveyDto.retreatId);
       if (getApplicationByUserIdData.ok) {
           const updateApplication: any = await applicationService.updateApplication(surveyDto);
           if (updateApplication.ok) {

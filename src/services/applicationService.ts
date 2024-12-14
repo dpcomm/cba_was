@@ -23,9 +23,9 @@ class ApplicationService {
       throw err;
     }
   }
-  async getApplicationByUserId(userId: string) {
+  async getApplicationByUserIdAndRetreatId(userId: string, retreatId: number) {
     try {
-      const application: application | null = await applicationRepository.findApplicationByUserId(userId);
+      const application = await applicationRepository.findApplicationByUserIdAndRetreatId(userId, retreatId);
       if (!application) {
         return ({
           ok: 0,
@@ -60,7 +60,7 @@ class ApplicationService {
   }
   async updateApplication(surveyDTO: requestApplicationDto) {
     try {
-      const application: application | null = await applicationRepository.findApplicationByUserId(surveyDTO.userId);
+      const application = await applicationRepository.findApplicationByUserIdAndRetreatId(surveyDTO.userId, surveyDTO.retreatId);
       if (application) {
         await applicationRepository.updateApplication(surveyDTO);
         return {
