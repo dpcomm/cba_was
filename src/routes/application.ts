@@ -7,7 +7,7 @@ const applicationController = new ApplicationController();
 
 applicationRouter.get('/management/', applicationController.getApplication);
 applicationRouter.post('/management/', applicationController.EditApplicationAttendedAndFeePaid);
-applicationRouter.get('/:user/:retreatid', applicationController.getApplicationByUserIdAndRetreatId);
+applicationRouter.get('/:user/:retreatid?', applicationController.getApplicationByUserIdAndRetreatId);
 applicationRouter.post('/', verifyAuth, applicationController.postApplication);
 
 /*
