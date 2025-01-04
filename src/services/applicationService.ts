@@ -5,6 +5,24 @@ import { EditApplicationAttendedAndFeePaidDtoType, requestApplicationDto } from 
 const applicationRepository = new ApplicationRepository();
 
 class ApplicationService {
+  async getOriginApplication() {
+    try {
+      const application = await applicationRepository.originFindApplication();
+      if (!application) {
+        return ({
+          ok: 0,
+          message: "Application not exist"
+        });
+      }
+      return ({
+        ok: 1,
+        message: "getAllApplication success",
+        application
+      });
+    } catch(err) {
+      throw err;
+    }
+  }
   async getAllApplication() {
     try {
       const application = await applicationRepository.findApplication();

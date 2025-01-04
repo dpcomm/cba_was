@@ -29,6 +29,26 @@ class ApplicationController {
       });
     }
   }
+  async getOriginApplication(req: Request, res: Response) {
+    try {
+      const getAllApplicationData = await applicationService.getOriginApplication()
+      if (getAllApplicationData.ok) {
+        return res.status(200).json({
+          message: getAllApplicationData.message,
+          application: getAllApplicationData.application
+        });
+      }
+      return res.status(401).json({
+        message: getAllApplicationData.message,
+      });
+    } catch (err: any) {
+      logger.error("Application controller error:", err)
+      return res.status(500).json({
+        message: err.message,
+        err: err
+      });
+    }
+  }
   async getApplication(req: Request, res: Response) {
     try {
       const getAllApplicationData = await applicationService.getAllApplication()

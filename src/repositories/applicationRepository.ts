@@ -1,10 +1,53 @@
 import { EditApplicationAttendedAndFeePaidDtoType, requestApplicationDto } from '@dtos/surveyDto';
 import { PrismaClient } from '@prisma/client';
 import { FindApplicationType } from '../types';
+import { group } from 'console';
 
 const prisma = new PrismaClient();
 
 class ApplicationRepository {
+  async originFindApplication() {
+    const applications = await prisma.application.findMany({
+      select: {
+        id: true,
+        attended: true,
+        feePaid: true,
+        surveyData: true,
+        user: {
+          select: {
+            userId: true,
+            name: true,
+            group: true,
+            phone: true,
+            birth: true,
+            gender: true,
+          },
+        },
+        retreat: {
+          select: {
+            title: true,
+          },
+        },
+      },
+    });
+    return applications.map((data: any) => ({
+      id: data.id,
+      name: data.user.name,
+      group: data.user.group,
+      gender: data.user.gender,
+      phone: data.user.phone,
+      birth: data.user.birth,
+      attended: data.attended,
+      feePaid: data.feePaid,
+      isLeader: data.surveyData.isLeader,
+      title: data.retreat.title,
+      userId: data.user.userId,
+      // transfer: data.surveyData.transfer.transfer,
+      // ownCar: data.surveyData.transfer['own-car'],
+      // bus: data.surveyData.transfer.bus,
+    }));
+  }
+
   async findApplication() {
     const applications = await prisma.application.findMany({
       select: {

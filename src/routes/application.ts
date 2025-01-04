@@ -5,6 +5,7 @@ import ApplicationController from "@controllers/applicationController";
 const applicationRouter = express.Router();
 const applicationController = new ApplicationController();
 
+applicationRouter.get('/originManagement/', applicationController.getOriginApplication);
 applicationRouter.get('/management/', applicationController.getApplication);
 applicationRouter.post('/management/', applicationController.EditApplicationAttendedAndFeePaid);
 applicationRouter.get('/:user/:retreatid?', applicationController.getApplicationByUserIdAndRetreatId);
