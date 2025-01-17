@@ -1,4 +1,4 @@
-import { requestAuthCheckDto, requestLoginUserDto, requestLogoutUserDto, requestRefreshAccessTokenDto, requestRegisterUserDto, checkUserDto, updateUserDto } from "@dtos/authDto";
+import { requestAuthCheckDto, requestLoginUserDto, requestLogoutUserDto, requestRefreshAccessTokenDto, requestRegisterUserDto, checkUserDto, updateUserDto, resetPasswordDto } from "@dtos/authDto";
 import bcrypt from "bcrypt";
 import { user } from "@/types/default";
 import UserRepository from "@repositories/userRepository";
@@ -190,27 +190,67 @@ class UserService {
       throw err;
     }
   }
-  async checkUserInfo (checkuser:checkUserDto) {
+  async checkUserInfo (checkUserDto: checkUserDto) {
     try {
-      const currentData = await userRepository.findUserByUserId(checkuser.userId);
-      const currentHash = currentData?.password ?? ""; //currentData가 null(undefined) & currentData.password도 null(undefined)일때 "" 반환 
-
-      const passwordPattern = /^(?=.*[a-zA-Z])(?=.*\d).{10,}$/;
-      if (!passwordPattern.test(checkuser.password)) {
-        return ({
-          ok: 0,
-          message: "Password pattern unfulfilled"
-        });
+      if (checkUserDto.password) {
+        const currentData = await userRepository.findUserByUserId(checkUserDto.userId);
+        const currentHash = currentData?.password ?? "";
+        // currentData가 null(undefined) & currentData.password도 null(undefined)일때 "" 반환
+        const passwordPattern = /^(?=.*[a-zA-Z])(?=.*\d).{10,}$/;
+        if (!passwordPattern.test(checkUserDto.password)) {
+          return ({
+            ok: 0,
+            message: "Password pattern unfulfilled"
+          });
+        }
+        const checkPassword = bcrypt.compareSync(checkUserDto.password, currentHash);
+        if (checkPassword) {
+          return {
+            ok: 1,
+            message: "본인인증 완료",
+            data:currentData
+          };
+        } else {
+          return {
+            ok: 0,
+            message: "잘못된 비밀번호가 입력되었습니다."
+          };
+        }
       }
-      const checkPassword = bcrypt.compareSync(checkuser.password, currentHash);
-      if (checkPassword) {
-        return {ok: 1, message: "본인인증 완료",data:currentData};
-      } else { 
-        return {ok: 0, message: "잘못된 비밀번호가 입력되었습니다."};
+      throw new Error("Password is required");
+    } catch (err) {
+      throw err;
     }
-    } catch (error) {
-      console.error("Error in password check:",error);
-      return { ok: 0, message: "An error occurred while checking the password."};
+  }
+  async checkUserWithoutPassword (checkUserDto: checkUserDto) {
+    try {
+      const user: user | null = await userRepository.findUserByUserId(checkUserDto.userId);
+      if (!user) {
+        return {
+          ok: 0,
+          message: "User does not exist",
+        };
+      }
+      const { name, gender, phone, group, birth } = checkUserDto;
+      if (
+        user.name !== name ||
+        user.gender !== gender ||
+        user.phone !== phone ||
+        user.group !== group ||
+        user.birth.toISOString().split("T")[0] !== birth
+      ) {
+        return {
+          ok: 0,
+          message: "User information does not match",
+        };
+      }
+      return {
+        ok: 1,
+        message: "User verified successfully",
+        user,
+      };
+    } catch (err) {
+      throw err;
     }
   }
   async getUserByUserId (userId: string) {
@@ -244,6 +284,28 @@ class UserService {
         ok: 1,
         message: "getAllUser success",
         user
+      });
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async resetPassword (userDTO: resetPasswordDto) {
+    try {
+      const user: user | null = await userRepository.findUserByUserId(userDTO.userId);
+      const passwordPattern = /^(?=.*[a-zA-Z])(?=.*\d).{10,}$/;
+      if (!passwordPattern.test(userDTO.password)) {
+        return ({
+          ok: 0,
+          message: "Password pattern unfulfilled"
+        });
+      }
+      const salt = bcrypt.genSaltSync(10);
+      const hash = bcrypt.hashSync(userDTO.password, salt);
+      await userRepository.updatePassword(userDTO.userId, hash);
+      return ({
+        ok: 1,
+        message: "Reset password success"
       });
     } catch (err) {
       throw err;

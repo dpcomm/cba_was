@@ -7,7 +7,8 @@ import {
   requestRefreshAccessTokenDto,
   requestRegisterUserDto,
   checkUserDto,
-  updateUserDto
+  updateUserDto,
+  resetPasswordDto
 } from '@dtos/authDto';
 import logger from '@utils/logger';
 
@@ -161,10 +162,8 @@ class UserController {
   async updateUser(req:Request,res:Response) {
     try {
       const updateDto: updateUserDto = req.body;
-      console.log(req.body)
       const updateData = await userService.updateUserInfo(updateDto);
       if (updateData.ok) {
-        // console.log(updateDto);
         return res.status(200).json({
           message: "User Update Success"
         });
@@ -180,18 +179,32 @@ class UserController {
       });
     }
   }
-  async checkUser(req:Request,res:Response) {
+  async checkUser(req: Request, res: Response) {
     try {
-      const checkDto: checkUserDto = req.body;
-      console.log(checkDto)
-      const checkData = await userService.checkUserInfo(checkDto);
-      if (checkData.ok) {
+      const checkUserDto: checkUserDto = req.body;
+      if (checkUserDto.password) {
+        /* userId, password로 본인인증 진행 */
+        const checkData = await userService.checkUserInfo(checkUserDto);
+        if (checkData.ok) {
+          return res.status(200).json({
+            message: "본인인증 완료",
+            data: checkData.data
+          });
+        }
+        return res.status(401).json({
+          message: checkData.message
+        });
+      }
+      /* 비밀번호를 제외한 정보로 본인인증 진행 */
+      const checkUserWithoutPassword = await userService.checkUserWithoutPassword(checkUserDto);
+      if (checkUserWithoutPassword.ok) {
         return res.status(200).json({
-          message: "본인인증 완료",data:checkData.data
+          message: "Success check user without password",
+          user: checkUserWithoutPassword.user
         });
       }
       return res.status(401).json({
-        message: checkData.message
+        message: checkUserWithoutPassword.message
       });
     } catch (err: any) {
       logger.error("checkUser controller error:", err);
@@ -201,6 +214,28 @@ class UserController {
       });
     }
   }
+  async resetPassword(req: Request, res: Response) {
+    try {
+      const userDto: resetPasswordDto = req.body;
+      const resetData = await userService.resetPassword(userDto);
+      if (resetData.ok) {
+        return res.status(200).json({
+          message: "Password reset success"
+        });
+      }
+      return res.status(401).json({
+        message: resetData.message
+      });
+    } catch (err: any) {
+      logger.error("resetPassword controller error:", err);
+      return res.status(500).json({
+        message: err.message,
+        err: err
+      });
+    }
+  }
 }
+
+
 
 export default UserController;

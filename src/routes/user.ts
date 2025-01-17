@@ -12,6 +12,7 @@ userRouter.post('/logout', userController.logout);
 userRouter.post('/register', userController.register);
 userRouter.post('/refresh', userController.refreshAccessToken);
 userRouter.post('/update', verifyAuth, userController.updateUser);
-userRouter.post('/checkuser', verifyAuth, userController.checkUser);
+userRouter.post('/check-user', userController.checkUser);
+userRouter.post('/reset-password', userController.resetPassword);
 
 export default userRouter;

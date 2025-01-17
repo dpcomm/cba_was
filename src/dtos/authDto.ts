@@ -41,5 +41,15 @@ export interface updateUserDto {
 
 export interface checkUserDto {
   userId: string,
-  password: string
+  password?: string,
+  name: string,
+  gender: string,
+  phone: string,
+  group: string,
+  birth: string,
+}
+
+export interface resetPasswordDto {
+  userId: string,
+  password: string,
 }

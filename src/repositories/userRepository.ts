@@ -1,6 +1,6 @@
 import { requestRegisterUserDto, updateUserDto } from '@dtos/authDto';
 import { PrismaClient } from '@prisma/client'
-import UserService from '@services/userService';
+
 
 const prisma = new PrismaClient()
 
@@ -41,6 +41,14 @@ class UserRepository {
         birth: new Date(updateDTO.birth),
         gender: updateDTO.gender
       },
+    });
+  }
+  async updatePassword(userId: string, hash: string) {
+    return await prisma.user.update({
+      where: {userId: userId},
+      data: {
+        password: hash
+      }
     });
   }
 }
