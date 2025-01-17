@@ -14,7 +14,7 @@ pipeline {
         }
         stage('Wipe') {
             steps {
-                sh "docker-compose -f docker-compose.prod.yml down --rmi all"
+                sh "sudo docker-compose -f docker-compose.prod.yml down --rmi all"
             }
         }
         stage('Build') {
