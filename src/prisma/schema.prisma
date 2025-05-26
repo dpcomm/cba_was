@@ -97,5 +97,7 @@ model Chat {
   message   String
   timestamp DateTime  
 
+  @@unique([senderId, roomId, message, timestamp])
+
   chatroom  Chatroom  @relation(fields: [roomId], references: [id])
 }

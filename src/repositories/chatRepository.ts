@@ -26,23 +26,23 @@ class ChatRepository {
             roomId: chat.roomId,
             senderId: chat.senderId,
             message: chat.message,
-            timestamp: chat.timestamp.getTime(),
+            timestamp: chat.timestamp.toISOString(),
         }));
 
         return chats;      
     }
-    async getChatsBetween(roomId: number, fromTimestamp: number, toTimestamp?: number): Promise<chatDto[]> {
+    async getChatsBetween(roomId: number, fromTimestamp: Date, toTimestamp?: Date): Promise<chatDto[]> {
         const whereClause: any = {
             roomId,
             timestamp: {
-                gte: new Date(fromTimestamp),
+                gte: fromTimestamp,
             },
         };
 
         if (toTimestamp !== undefined) {
             whereClause.timestamp = {
                 ...whereClause.timestamp,
-                lt: new Date(toTimestamp),
+                lt: toTimestamp,
             };
         }
 
@@ -57,7 +57,7 @@ class ChatRepository {
             roomId: chat.roomId,
             senderId: chat.senderId,
             message: chat.message,
-            timestamp: chat.timestamp.getTime(),
+            timestamp: chat.timestamp.toISOString(),
         }));
 
         return chats;       

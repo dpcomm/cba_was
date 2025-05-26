@@ -6,23 +6,25 @@ import ChatRepository from '@repositories/chatRepository'
 const chatRepository = new ChatRepository();
 const MAX_MESSAGES = 50;
 
-export default async function ( socket: Socket, recentChatDTO: chatDto, callback: Function) {
+export default async function ( socket: Socket, recentChatDTO: chatDto, alreadyEnter: boolean, callback: Function) {
     try {
         const redisKey = `chatroom:${recentChatDTO.roomId}:message`;
-        const timestamp = recentChatDTO.timestamp;
+        const timestamp = new Date(recentChatDTO.timestamp).getTime();
 
         console.log(`user${recentChatDTO.senderId} request unread message`);
         
         //채팅방에 처음 입장한 경우 - recent chat이 존재하지 않는 경우
-        //timestamp = 0으로 설정되어 전송됨
-        if (timestamp == 0) {
+        //alreadEnter = true으로 설정되어 전송됨
+        if (alreadyEnter == true) {
             console.log(`user${recentChatDTO.senderId} request all unread messages`);    
             const mysqlChats: chatDto[] = await chatRepository.getAllChats(recentChatDTO.roomId);
 
+            console.log("chats from mysql");
+            console.log(mysqlChats);
             //mysql에서 획득한 chat을 redis에 cache
             if (mysqlChats.length > 0) {
                 const redisZaddData = mysqlChats.map(chat => ({
-                    score: chat.timestamp,
+                    score: new Date(chat.timestamp).getTime(),
                     value: JSON.stringify(chat),
                 }));
                 await redisClient.zAdd(redisKey, redisZaddData);
@@ -38,15 +40,15 @@ export default async function ( socket: Socket, recentChatDTO: chatDto, callback
                 
                 //현재 redis에 있는 가장 오래된 chat의 timestamp 구하기
                 const redistOldestRaw = await redisClient.zRange(redisKey, 0, 0, { withScores: true } as any);
-                const redisOldestScore = redistOldestRaw.length === 2 ? Number(redistOldestRaw[1]) : undefined;
+                const redisOldestScore = redistOldestRaw.length === 2 ? new Date(Number(redistOldestRaw[1])) : undefined;
 
                 //구해진 timestamp구간의 chat을 DB로부터 획득 
-                const mysqlChats: chatDto[] = await chatRepository.getChatsBetween(recentChatDTO.roomId, timestamp, redisOldestScore);
+                const mysqlChats: chatDto[] = await chatRepository.getChatsBetween(recentChatDTO.roomId, new Date(timestamp), redisOldestScore);
 
                 //DB에서 획득한 chat을 redis에 cache
                 if (mysqlChats.length > 0) {
                     const redisZaddData = mysqlChats.map(chat => ({
-                        score: chat.timestamp,
+                        score: new Date(chat.timestamp).getTime(),
                         value: JSON.stringify(chat),
                     }));
                     await redisClient.zAdd(redisKey, redisZaddData);
@@ -62,7 +64,7 @@ export default async function ( socket: Socket, recentChatDTO: chatDto, callback
         //redis에서 원하는 시점 이후의 chat을 획득
         const rawResults = await redisClient.zRangeByScore(
             redisKey, 
-            timestamp,
+            alreadyEnter? 0: timestamp,
             '+inf', 
             {
                 LIMIT: {
@@ -73,6 +75,9 @@ export default async function ( socket: Socket, recentChatDTO: chatDto, callback
         );
         const chats = rawResults.map(chat => JSON.parse(chat) as chatDto);
         
+        console.log('result chat');
+        console.log(chats);
+
         const result = {
             success: true,
             message: "unread messages",

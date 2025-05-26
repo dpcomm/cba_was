@@ -15,7 +15,7 @@ export default async function(socket: Socket, chatDTO: chatDto, callback: Functi
             senderId: chatDTO.senderId,
             roomId: chatDTO.roomId,
             message: chatDTO.message,
-            timestamp: new Date().getTime(),
+            timestamp: new Date(),
         };
 
         //await redisClient.rPush(`chatroom:${chatDTO.roomId}:message`, JSON.stringify(chat));
@@ -23,7 +23,7 @@ export default async function(socket: Socket, chatDTO: chatDto, callback: Functi
         //timestamp를 score로 이용한 sorted set에 chat 저장
         await redisClient.zAdd(`chatroom:${chatDTO.roomId}:message`, [
             {
-                score: chat.timestamp, 
+                score: chat.timestamp.getTime(), 
                 value: JSON.stringify(chat)
            }
         ]);
