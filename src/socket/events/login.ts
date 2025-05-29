@@ -4,7 +4,7 @@ import UserRepository from "@repositories/userRepository";
 
 const userRepository = new UserRepository();
 
-export default async function (socket: Socket, userId: number, callback: Function) {
+export default async function (socket: Socket, userId: number, callback?: Function) {
     try {
         
         await redisClient.hSet("userToSocket", String(userId), socket.id);
@@ -25,9 +25,18 @@ export default async function (socket: Socket, userId: number, callback: Functio
         };
         
         console.log(`user login: ${userId}`);
-        callback(result);
+        if(callback) {
+            callback(result);
+        } else {
+            return result;
+        }
 
     } catch (err: any) {
-        callback({status: "login error", message: err.message, err: err })
+        if(callback) {
+            callback({status: "login error", message: err.message, err: err });            
+        } else {
+            return {status: "login error", message: err.message, err: err };
+        }
+
     }
 }

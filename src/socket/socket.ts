@@ -1,7 +1,7 @@
 import { Server } from 'socket.io';
 import * as socketHandlers from '@socket/events';
 import { chatDto, requestUnreadChatDto } from '@dtos/chatDto';
-import requestUnreadMessages from './events/requestUnreadMessages';
+import JwtProvider from '@utils/jwtProvider';
 
 // socket event 
 const EVENTS = {
@@ -13,9 +13,28 @@ const EVENTS = {
   DISCONNECT: 'disconnect',
 }
 
-
+const jwtProvider = new JwtProvider();
 
 export function setupSocketEvents(io: Server) {
+  io.use(async (socket, next) => {
+    console.log("connection request")
+    const raw = socket.handshake.headers['authorization'];
+    const token = raw?.split(' ')[1];
+
+    if(!token) {
+      return next(new Error('No token provided'));
+    }
+
+    try {
+      const decoded = await jwtProvider.verifyAccessToken(token);
+
+      socketHandlers.handleLogin(socket, decoded.id);
+      next();
+    } catch (err) {
+      next(new Error('unauthorized'));
+    }
+
+  });
   io.on('connection', (socket) => {
     socketHandlers.handleConnect(socket);
     socket.on(EVENTS.LOGIN, async (userId: number, callback) => socketHandlers.handleLogin(socket, userId, callback));
