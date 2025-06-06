@@ -10,6 +10,7 @@ const EVENTS = {
   LOGOUT: 'logout', 
   CHAT: 'chat',
   REQUEST_UNREAD_MESSAGES: 'request unread messages', 
+  MESSAGES_LOADING: 'request message loading',
   DISCONNECT: 'disconnect',
 }
 
@@ -27,7 +28,6 @@ export function setupSocketEvents(io: Server) {
 
     try {
       const decoded = await jwtProvider.verifyAccessToken(token);
-
       socketHandlers.handleLogin(socket, decoded.id);
       next();
     } catch (err) {
@@ -39,7 +39,8 @@ export function setupSocketEvents(io: Server) {
     socketHandlers.handleConnect(socket);
     socket.on(EVENTS.LOGIN, async (userId: number, callback) => socketHandlers.handleLogin(socket, userId, callback));
     socket.on(EVENTS.LOGOUT, async (userId: number, callback) => socketHandlers.handleLogout(socket, userId, callback));
-    socket.on(EVENTS.REQUEST_UNREAD_MESSAGES, async (requestUnreadMessages: requestUnreadChatDto, callback) => socketHandlers.handleRequestUnreadMessages(socket, requestUnreadMessages.recentChat, requestUnreadMessages.alreadyEnter, callback));
+    socket.on(EVENTS.MESSAGES_LOADING, async (chat: chatDto, callback) => socketHandlers.handleLoadingChats(socket, chat, callback));
+    socket.on(EVENTS.REQUEST_UNREAD_MESSAGES, async (requestUnreadMessages: requestUnreadChatDto, callback) => socketHandlers.handleRequestUnreadMessages(socket, requestUnreadMessages.recentChat, requestUnreadMessages.requestAll, callback));
     socket.on(EVENTS.CHAT, async (chatDTO: chatDto, callback) => socketHandlers.handleChat(socket, chatDTO, callback));
     socket.on(EVENTS.DISCONNECT, () => socketHandlers.handleDisconnect(socket));
   });

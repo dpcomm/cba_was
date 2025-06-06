@@ -7,5 +7,5 @@ export interface chatDto {
 
 export interface requestUnreadChatDto {
   recentChat: chatDto,
-  alreadyEnter: boolean,
+  requestAll: boolean,
 }

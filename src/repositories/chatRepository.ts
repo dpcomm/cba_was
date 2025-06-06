@@ -48,9 +48,14 @@ class ChatRepository {
 
         const result = await prisma.chat.findMany({
             where: whereClause,
-            orderBy: {
-                timestamp: 'asc',
-            },
+            orderBy: [
+                {
+                    timestamp: 'asc',
+                },
+                {
+                    senderId: 'asc',
+                },
+            ],
         });
 
         const chats: chatDto[] = result.map(chat => ({
@@ -62,6 +67,48 @@ class ChatRepository {
 
         return chats;       
     };    
+    async getChatsForward(roomId: number, userId: number, timestamp: Date, limit: number): Promise<chatDto[]> {
+        const result = await prisma.chat.findMany({
+            where: {
+                roomId,
+                OR: [
+                    {
+                        timestamp: {
+                            lt: timestamp,
+                        },
+                    },
+                    {
+                        timestamp: {
+                            equals: timestamp,
+                        },
+                        senderId: {
+                            lte: userId,
+                        },
+                    },
+                ],
+            },
+            orderBy: [
+                {
+                    timestamp: "asc",
+                },
+                {
+                    senderId: "asc",
+                },
+            ],
+            take: limit
+        });
+
+        const chats: chatDto[] = result.map(chat => ({
+            roomId: chat.roomId,
+            senderId: chat.senderId,
+            message: chat.message,
+            timestamp: chat.timestamp.toISOString(),
+        }));
+
+        return chats;   
+
+    }
+
 }
 
 export default ChatRepository;
