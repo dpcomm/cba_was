@@ -53,3 +53,8 @@ export interface resetPasswordDto {
   userId: string,
   password: string,
 }
+
+export interface updateGroupDto {
+  userId: string,
+  group: string
+}

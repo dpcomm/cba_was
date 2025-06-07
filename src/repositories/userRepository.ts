@@ -1,4 +1,4 @@
-import { requestRegisterUserDto, updateUserDto } from '@dtos/authDto';
+import { requestRegisterUserDto, updateGroupDto, updateUserDto } from '@dtos/authDto';
 import { PrismaClient } from '@prisma/client'
 
 
@@ -49,6 +49,14 @@ class UserRepository {
       data: {
         password: hash
       }
+    });
+  }
+  async updateUserGroup(groupDTO: updateGroupDto) {
+    return await prisma.user.update({
+      where: {userId: groupDTO.userId},
+      data: {
+        group: groupDTO.group
+      },
     });
   }
 }
