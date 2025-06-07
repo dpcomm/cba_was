@@ -1,4 +1,4 @@
-import { requestAuthCheckDto, requestLoginUserDto, requestLogoutUserDto, requestRefreshAccessTokenDto, requestRegisterUserDto, checkUserDto, updateUserDto, resetPasswordDto } from "@dtos/authDto";
+import { requestAuthCheckDto, requestLoginUserDto, requestLogoutUserDto, requestRefreshAccessTokenDto, requestRegisterUserDto, checkUserDto, updateUserDto, resetPasswordDto, updateGroupDto } from "@dtos/authDto";
 import bcrypt from "bcrypt";
 import { user } from "@/types/default";
 import UserRepository from "@repositories/userRepository";
@@ -307,6 +307,27 @@ class UserService {
         ok: 1,
         message: "Reset password success"
       });
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async updateUserGroup (groupDTO: updateGroupDto) {
+    try {
+      const user: user | null = await userRepository.findUserByUserId(groupDTO.userId);
+      if (!user) {
+        return {
+          ok: 0,
+          message: "User not exist"
+        };
+      }
+
+      await userRepository.updateUserGroup(groupDTO);
+
+      return {
+        ok: 1,
+        message: "Update group success"
+      };
     } catch (err) {
       throw err;
     }
