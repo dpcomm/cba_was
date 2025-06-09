@@ -51,13 +51,7 @@ class UserRepository {
       }
     });
   }
-  async findGroupsByUserId(userId: number) {
-    return await prisma.member.findMany({
-      where: {
-        userId: userId
-      }
-    });
-  }
+
 }
 
 

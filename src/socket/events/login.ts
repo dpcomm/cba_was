@@ -1,8 +1,8 @@
 import { Socket } from "socket.io";
 import redisClient from "@utils/redis";
-import UserRepository from "@repositories/userRepository";
+import CarpoolMemberRepository from "@repositories/carpoolMemberRepository";
 
-const userRepository = new UserRepository();
+const carpoolMemberRepository = new CarpoolMemberRepository();
 
 export default async function (socket: Socket, userId: number, callback?: Function) {
     try {
@@ -10,7 +10,7 @@ export default async function (socket: Socket, userId: number, callback?: Functi
         await redisClient.hSet("userToSocket", String(userId), socket.id);
         await redisClient.hSet("socketToUser", socket.id, String(userId));
 
-        const groups: any = await userRepository.findGroupsByUserId(userId);
+        const groups: any = await carpoolMemberRepository.findGroupsByUserId(userId);
         for (const group of groups) {
             if (group.type == "chatroom") {
                 socket.join(`chatroom:${group.targetId}`);
