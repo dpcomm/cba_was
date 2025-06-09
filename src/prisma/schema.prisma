@@ -106,7 +106,7 @@ model Chat {
   senderId       Int
   roomId         Int
   message        String
-  timestamp      DateTime          
+  timestamp      DateTime
 
   sender         User              @relation("UserChats", fields: [senderId], references: [id])
   room           CarpoolRoom       @relation(fields: [roomId], references: [id])

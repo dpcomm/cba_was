@@ -25,15 +25,16 @@ CREATE TABLE `carpool_members` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `chat_log` (
+CREATE TABLE `Chat` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `senderId` INTEGER NOT NULL,
     `roomId` INTEGER NOT NULL,
     `message` VARCHAR(191) NOT NULL,
-    `timestamp` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `timestamp` DATETIME(3) NOT NULL,
 
-    INDEX `chat_log_roomId_idx`(`roomId`),
-    INDEX `chat_log_senderId_idx`(`senderId`),
+    INDEX `Chat_roomId_idx`(`roomId`),
+    INDEX `Chat_senderId_idx`(`senderId`),
+    UNIQUE INDEX `Chat_senderId_roomId_message_timestamp_key`(`senderId`, `roomId`, `message`, `timestamp`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -47,7 +48,7 @@ ALTER TABLE `carpool_members` ADD CONSTRAINT `carpool_members_userId_fkey` FOREI
 ALTER TABLE `carpool_members` ADD CONSTRAINT `carpool_members_roomId_fkey` FOREIGN KEY (`roomId`) REFERENCES `CarpoolRoom`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `chat_log` ADD CONSTRAINT `chat_log_senderId_fkey` FOREIGN KEY (`senderId`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Chat` ADD CONSTRAINT `Chat_senderId_fkey` FOREIGN KEY (`senderId`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `chat_log` ADD CONSTRAINT `chat_log_roomId_fkey` FOREIGN KEY (`roomId`) REFERENCES `CarpoolRoom`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Chat` ADD CONSTRAINT `Chat_roomId_fkey` FOREIGN KEY (`roomId`) REFERENCES `CarpoolRoom`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
