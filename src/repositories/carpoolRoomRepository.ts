@@ -1,4 +1,3 @@
-// src/repositories/CarpoolRoomRepository.ts
 import { PrismaClient, CarpoolRoom } from '@prisma/client';
 import { CreateCarpoolDto, UpdateCarpoolDto } from '@dtos/carpoolDto';
 
