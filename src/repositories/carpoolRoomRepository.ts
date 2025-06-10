@@ -37,20 +37,19 @@ export default class CarpoolRoomRepository {
   async create(dto: CreateCarpoolDto): Promise<CarpoolRoom> {
     return prisma.carpoolRoom.create({
       data: {
-        driverId:    dto.driverId,
-        phone:       dto.phone,
-        carInfo:    dto.carInfo,
-        origin:      dto.origin,
+        driverId: dto.driverId,
+        carInfo: dto.carInfo,
+        origin: dto.origin,
         originDetailed: dto.originDetailed,
         destination: dto.destination,
-        seatsTotal:  dto.seatsTotal,
-        seatsLeft:   dto.seatsTotal,
-        note:        dto.note,
+        seatsTotal: dto.seatsTotal,
+        seatsLeft: dto.seatsTotal,
+        note: dto.note,
         originLat: dto.originLat,
         originLng: dto.originLng,
-        destLat:   dto.destLat,
-        destLng:   dto.destLng,
-        isArrived:   false,
+        destLat: dto.destLat,
+        destLng: dto.destLng,
+        isArrived: false,
       },
     });
   }
@@ -59,17 +58,18 @@ export default class CarpoolRoomRepository {
     return prisma.carpoolRoom.update({
       where: { id },
       data: {
-        origin:         dto.origin,
+        carInfo:    dto.carInfo,
+        origin: dto.origin,
         originDetailed: dto.originDetailed,
-        destination:    dto.destination,
-        seatsTotal:     dto.seatsTotal,
-        seatsLeft:      dto.seatsLeft,
-        note:           dto.note,
-        originLat:      dto.originLat,
-        originLng:      dto.originLng,
-        destLat:        dto.destLat,
-        destLng:        dto.destLng,
-        isArrived:      dto.isArrived,
+        destination: dto.destination,
+        seatsTotal: dto.seatsTotal,
+        seatsLeft: dto.seatsLeft,
+        note: dto.note,
+        originLat: dto.originLat,
+        originLng: dto.originLng,
+        destLat: dto.destLat,
+        destLng: dto.destLng,
+        isArrived: dto.isArrived,
       },
     });
   }

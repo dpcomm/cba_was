@@ -75,7 +75,6 @@ model Pray {
 model CarpoolRoom {
   id             Int               @id @default(autoincrement())
   driverId       Int
-  phone          String?  @db.VarChar(20)
   carInfo        String?
   origin         String
   originDetailed String
