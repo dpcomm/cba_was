@@ -44,6 +44,10 @@ export default class CarpoolRoomRepository {
         seatsTotal:  dto.seatsTotal,
         seatsLeft:   dto.seatsTotal,
         note:        dto.note,
+        originLat: dto.originLat,
+        originLng: dto.originLng,
+        destLat:   dto.destLat,
+        destLng:   dto.destLng,
         isArrived:   false,
         // 만약 startTime 필드가 있다면 dto.startTime
       },
@@ -60,6 +64,10 @@ export default class CarpoolRoomRepository {
         seatsTotal:     dto.seatsTotal,
         seatsLeft:      dto.seatsLeft,
         note:           dto.note,
+        originLat:      dto.originLat,
+        originLng:      dto.originLng,
+        destLat:        dto.destLat,
+        destLng:        dto.destLng,
         isArrived:      dto.isArrived,
       },
     });

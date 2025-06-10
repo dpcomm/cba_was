@@ -5,6 +5,10 @@ export interface CreateCarpoolDto {
   destination: string;
   seatsTotal: number;
   note: string;
+  originLat: number;
+  originLng: number;
+  destLat: number;
+  destLng: number;
 }
 
 export interface UpdateCarpoolDto extends Partial<CreateCarpoolDto> {
