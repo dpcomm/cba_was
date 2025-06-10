@@ -81,6 +81,12 @@ model CarpoolRoom {
   seatsTotal     Int
   seatsLeft      Int
   note           String
+
+  originLat      Decimal?  @db.Decimal(10, 6)
+  originLng      Decimal?  @db.Decimal(10, 6)
+  destLat        Decimal?  @db.Decimal(10, 6)
+  destLng        Decimal?  @db.Decimal(10, 6)
+
   isArrived      Boolean           @default(false)
   createdAt      DateTime          @default(now())
   updatedAt      DateTime          @updatedAt
