@@ -38,6 +38,8 @@ export default class CarpoolRoomRepository {
     return prisma.carpoolRoom.create({
       data: {
         driverId:    dto.driverId,
+        phone:       dto.phone,
+        carInfo:    dto.carInfo,
         origin:      dto.origin,
         originDetailed: dto.originDetailed,
         destination: dto.destination,
@@ -49,7 +51,6 @@ export default class CarpoolRoomRepository {
         destLat:   dto.destLat,
         destLng:   dto.destLng,
         isArrived:   false,
-        // 만약 startTime 필드가 있다면 dto.startTime
       },
     });
   }

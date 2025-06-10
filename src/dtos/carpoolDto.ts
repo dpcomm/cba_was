@@ -1,5 +1,7 @@
 export interface CreateCarpoolDto {
   driverId: number;
+  phone: string;
+  carInfo: string;
   origin: string;
   originDetailed: string;
   destination: string;
