@@ -26,6 +26,7 @@ model User {
   createdRooms   CarpoolRoom[]     @relation("DriverRooms")
   joinedRooms    CarpoolMember[]
   chats       Chat[]         @relation("UserChats")
+  tokens      FcmToken[]     @relation("UserTokens")
 }
 
 model Application {
@@ -114,4 +115,14 @@ model Chat {
   @@unique([senderId, roomId, message, timestamp])
   @@index([roomId])
   @@index([senderId])
+}
+
+
+model FcmToken {
+  id      Int @id @default(autoincrement())
+  userId  Int
+  token   String  @unique
+
+  user  User  @relation("UserTokens", fields: [userId], references: [id])
+  @@index([userId])
 }
