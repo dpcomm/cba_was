@@ -14,5 +14,6 @@ userRouter.post('/refresh', userController.refreshAccessToken);
 userRouter.post('/update', verifyAuth, userController.updateUser);
 userRouter.post('/check-user', userController.checkUser);
 userRouter.post('/reset-password', userController.resetPassword);
+userRouter.post('/:user/group', userController.updateUserGroup);
 
 export default userRouter;

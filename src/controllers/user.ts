@@ -8,7 +8,8 @@ import {
   requestRegisterUserDto,
   checkUserDto,
   updateUserDto,
-  resetPasswordDto
+  resetPasswordDto,
+  updateGroupDto
 } from '@dtos/authDto';
 import logger from '@utils/logger';
 
@@ -234,8 +235,26 @@ class UserController {
       });
     }
   }
+  async updateUserGroup(req: Request, res: Response) {
+    try {
+      const updateGroupDto: updateGroupDto = req.body;
+      const updateGroupData = await userService.updateUserGroup(updateGroupDto)
+      if (updateGroupData.ok) {
+        return res.status(200).json({
+          message: "Password reset success"
+        });
+      }
+      return res.status(401).json({
+        message: updateGroupData.message
+      });
+    } catch (err: any) {
+      logger.error("resetPassword controller error:", err);
+      return res.status(500).json({
+        message: err.message,
+        err: err
+      });
+    }
+  }
 }
-
-
 
 export default UserController;
