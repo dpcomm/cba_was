@@ -13,6 +13,8 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import { setupSocketEvents } from "@socket/socket";
 import "@utils/cron";
+import carpoolRouter from "@routes/carpool";
+import "@firebase/firebaseAdmin";
 
 dotenv.config();
 const app = express();
@@ -36,6 +38,7 @@ app.use("/api/application", applicationRouter);
 app.use("/api/youtube", youtubeRouter);
 app.use("/api/pray", prayRouter);
 app.use("/api/dashboard", dashboardRouter);
+app.use("/api/carpool", carpoolRouter);
 
 //previous version - only used express
 // app.listen(process.env.SERVER_PORT, () => {
