@@ -14,6 +14,7 @@ import { Server } from "socket.io";
 import { setupSocketEvents } from "@socket/socket";
 import "@utils/cron";
 import carpoolRouter from "@routes/carpool";
+import "@firebase/firebaseAdmin";
 
 dotenv.config();
 const app = express();
