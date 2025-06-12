@@ -75,12 +75,19 @@ model Pray {
 model CarpoolRoom {
   id             Int               @id @default(autoincrement())
   driverId       Int
+
   carInfo        String?
+  departureTime  DateTime  @default(now()) // 나중에 변경해야 함.
+
   origin         String
-  originDetailed String
+  originDetailed String?
+
   destination    String
+  destinationDetailed String?
+
   seatsTotal     Int
   seatsLeft      Int
+
   note           String
 
   originLat      Decimal?  @db.Decimal(10, 6)

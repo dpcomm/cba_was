@@ -4,13 +4,19 @@ import { CreateCarpoolDto, UpdateCarpoolDto } from '@dtos/carpoolDto';
 const prisma = new PrismaClient();
 
 export default class CarpoolRoomRepository {
-  async findAll(origin?: string, destination?: string): Promise<CarpoolRoom[]> {
+  async findAll(
+    origin?: string,
+    destination?: string,
+  ): Promise<CarpoolRoom[]> {
     return prisma.carpoolRoom.findMany({
       where: {
         origin: origin ? { contains: origin } : undefined,
         destination: destination ? { equals: destination } : undefined,
       },
       orderBy: { createdAt: 'desc' },
+      include: {
+        driver: { select: { id: true, name: true } },
+      },
     });
   }
 
@@ -18,18 +24,22 @@ export default class CarpoolRoomRepository {
     return prisma.carpoolRoom.findUnique({
       where: { id },
       include: {
-        driver: { select: { id: true, name: true, phone: true } },
+        driver: {
+          select: { id: true, name: true, phone: true },
+        },
         members: {
           include: {
-            user: { select: { id: true, name: true } }
-          }
+            user: {
+              select: { id: true, name: true, phone: true }
+            },
+          },
         },
         chats: {
           include: {
-            sender: { select: { id: true, name: true } }
+            sender: { select: { id: true, name: true } },
           },
-          orderBy: { timestamp: 'asc' }
-        }
+          orderBy: { timestamp: 'asc' },
+        },
       },
     });
   }
@@ -39,9 +49,11 @@ export default class CarpoolRoomRepository {
       data: {
         driverId: dto.driverId,
         carInfo: dto.carInfo,
+        departureTime: dto.departureTime,
         origin: dto.origin,
-        originDetailed: dto.originDetailed,
+        originDetailed: dto.originDetailed ?? null,
         destination: dto.destination,
+        destinationDetailed: dto.destinationDetailed ?? null,
         seatsTotal: dto.seatsTotal,
         seatsLeft: dto.seatsTotal,
         note: dto.note,
@@ -58,10 +70,12 @@ export default class CarpoolRoomRepository {
     return prisma.carpoolRoom.update({
       where: { id },
       data: {
-        carInfo:    dto.carInfo,
+        carInfo: dto.carInfo,
+        departureTime: dto.departureTime,
         origin: dto.origin,
-        originDetailed: dto.originDetailed,
+        originDetailed: dto.originDetailed ?? null,
         destination: dto.destination,
+        destinationDetailed: dto.destinationDetailed ?? null,
         seatsTotal: dto.seatsTotal,
         seatsLeft: dto.seatsLeft,
         note: dto.note,

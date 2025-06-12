@@ -140,9 +140,12 @@ class UserService {
         });
       });
 
+      const user: user | null = await userRepository.findUserById(decodedAccessToken.id);
+
       return ({
         ok: 1,
         message: "Token reissue success",
+        user,
         accessToken,
       });
     } catch(err) {
