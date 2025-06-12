@@ -44,15 +44,16 @@ export default class CarpoolRoomRepository {
     });
   }
 
-
   async create(dto: CreateCarpoolDto): Promise<CarpoolRoom> {
     return prisma.carpoolRoom.create({
       data: {
         driverId: dto.driverId,
         carInfo: dto.carInfo,
+        departureTime: dto.departureTime,
         origin: dto.origin,
-        originDetailed: dto.originDetailed,
+        originDetailed: dto.originDetailed ?? null,
         destination: dto.destination,
+        destinationDetailed: dto.destinationDetailed ?? null,
         seatsTotal: dto.seatsTotal,
         seatsLeft: dto.seatsTotal,
         note: dto.note,
@@ -69,10 +70,12 @@ export default class CarpoolRoomRepository {
     return prisma.carpoolRoom.update({
       where: { id },
       data: {
-        carInfo:    dto.carInfo,
+        carInfo: dto.carInfo,
+        departureTime: dto.departureTime,
         origin: dto.origin,
-        originDetailed: dto.originDetailed,
+        originDetailed: dto.originDetailed ?? null,
         destination: dto.destination,
+        destinationDetailed: dto.destinationDetailed ?? null,
         seatsTotal: dto.seatsTotal,
         seatsLeft: dto.seatsLeft,
         note: dto.note,
