@@ -20,6 +20,13 @@ class UserRepository {
       }
     });
   }
+  async findUserById(id: number) {
+    return await prisma.user.findUnique({
+      where: {
+        id: id
+      }
+    });
+  }
   async findUserByUserId(userId: string) {
     return await prisma.user.findUnique({
       where: {

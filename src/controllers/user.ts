@@ -90,7 +90,8 @@ class UserController {
       if (refreshAccessTokenData.ok) {
         return res.status(200).json({
           message: "Refresh access token success",
-          accessToken: refreshAccessTokenData.accessToken
+          accessToken: refreshAccessTokenData.accessToken,
+          user: refreshAccessTokenData.user
         })
       }
       return res.status(401).json({
