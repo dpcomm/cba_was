@@ -6,6 +6,7 @@ export interface requestApplicationDto {
     bus?: number[],
     carId?: string,
     isLeader?: boolean,
+    childCount?: number
 }
 
 

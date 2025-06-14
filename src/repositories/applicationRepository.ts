@@ -89,6 +89,7 @@ class ApplicationRepository {
         bus: surveyDTO.bus,
       },
       isLeader: surveyDTO.isLeader,
+      childCount: surveyDTO.childCount
     };
 
     const existingApplication = await prisma.application.findUnique({
@@ -127,6 +128,7 @@ class ApplicationRepository {
         bus: surveyDTO.bus,
       },
       isLeader: surveyDTO.isLeader,
+      childCount: surveyDTO.childCount
     };
 
     return await prisma.application.update({
