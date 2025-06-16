@@ -61,7 +61,6 @@ export default class CarpoolRoomRepository {
         originLng: dto.originLng,
         destLat: dto.destLat,
         destLng: dto.destLng,
-        isArrived: false,
       },
     });
   }
