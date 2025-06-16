@@ -114,6 +114,36 @@ class CarpoolController {
       return res.status(500).json({ message: err.message, err });
     }
   }
+
+  async joinCarpoolRoom(req: Request, res: Response) {
+    try {
+      const { userId, roomId } = req.body;
+      const result: any = await this.carpoolService.joinCarpoolRoom(userId, roomId);
+      if (result.ok) {
+        logger.http(`joinCarpoolRoom user:${userId} room:${roomId}`);
+        return res.status(201).json({ message: 'Success joinCarpool' });
+      }
+      return res.status(400).json({ message: result.message });
+    } catch (err: any) {
+      logger.error('CarpoolController#joinCarpoolRoom error:', err);
+      return res.status(500).json({ message: err.message, err });
+    }
+  }
+
+  async leaveCarpoolRoom(req: Request, res: Response) {
+    try {
+      const { userId, roomId } = req.body;
+      const result: any = await this.carpoolService.leaveCarpoolRoom(userId, roomId);
+      if (result.ok) {
+        logger.http(`leaveCarpoolRoom user:${userId} room:${roomId}`);
+        return res.status(200).json({ message: 'Success leaveCarpool' });
+      }
+      return res.status(400).json({ message: result.message });
+    } catch (err: any) {
+      logger.error('CarpoolController#leaveCarpoolRoom error:', err);
+      return res.status(500).json({ message: err.message, err });
+    }
+  }
 }
 
 export default CarpoolController;

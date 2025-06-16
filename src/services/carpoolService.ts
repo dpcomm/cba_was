@@ -1,8 +1,10 @@
 import { CreateCarpoolDto, UpdateCarpoolDto } from "@dtos/carpoolDto";
+import CarpoolMemberRepository from "@repositories/carpoolMemberRepository";
 import CarpoolRoomRepository from "@repositories/carpoolRoomRepository";
 
 class CarpoolService {
   private carpoolRoomRepository = new CarpoolRoomRepository();
+  private carpoolMemberRepository = new CarpoolMemberRepository();
 
   async getAllCarpoolRooms() {
     try {
@@ -44,23 +46,20 @@ class CarpoolService {
     }
   }
 
-  /* 아마 이때 채팅방 열어어 할 듯. */
   async createCarpoolRoom(dto: CreateCarpoolDto) {
-    try {
-      const room = await this.carpoolRoomRepository.create(dto);
-      if (!room) {
-        return {
-          ok: 0,
-          message: 'Failed to create carpool'
-        };
-      }
+    const room = await this.carpoolRoomRepository.create(dto)
+    if (!room) {
       return {
-        ok: 1,
-        message: 'createCarpool success',
-        room
-      };
-    } catch (err) {
-      throw err;
+        ok: 0,
+        message: 'Failed to create carpool',
+      }
+    }
+    /** 생성과 동시에 드라이버를 멤버로 추가. */
+    await this.carpoolMemberRepository.addMember(dto.driverId, room.id)
+    return {
+      ok: 1,
+      message: 'createCarpool success',
+      room,
     }
   }
 
@@ -83,8 +82,13 @@ class CarpoolService {
     }
   }
 
+  /** 카풀 방 삭제 (멤버 먼저 제거 후 방 삭제) */
   async deleteCarpoolRoom(id: number) {
     try {
+      // 방에 속한 모든 멤버 제거
+      await this.carpoolMemberRepository.removeAllByRoomId(id);
+
+      // 방 삭제
       const result = await this.carpoolRoomRepository.delete(id);
       if (!result) {
         return {
@@ -95,6 +99,33 @@ class CarpoolService {
       return {
         ok: 1,
         message: 'deleteCarpool success'
+      };
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async joinCarpoolRoom(userId: number, roomId: number) {
+    const isMember = await this.carpoolMemberRepository.isMember(userId, roomId);
+    if (isMember) {
+      return {
+        ok: 0,
+        message: 'User already joined this carpool'
+      };
+    }
+    await this.carpoolMemberRepository.addMember(userId, roomId);
+    return {
+      ok: 1,
+      message: 'joinCarpool success'
+    };
+  }
+
+  async leaveCarpoolRoom(userId: number, roomId: number) {
+    try {
+      await this.carpoolMemberRepository.removeMember(userId, roomId);
+      return {
+        ok: 1,
+        message: 'leaveCarpool success'
       };
     } catch (err) {
       throw err;

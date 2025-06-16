@@ -6,16 +6,18 @@ const carpoolRouter = express.Router();
 const carpoolController = new CarpoolController();
 
 /* 카풀 리스트 전체 출력 */
-carpoolRouter.get("/", carpoolController.getAllCarpoolRooms);
+carpoolRouter.get("/", verifyAuth, carpoolController.getAllCarpoolRooms);
 /* 상세 카풀 방 조회 */
-carpoolRouter.get("/:id", carpoolController.getCarpoolRoomById);
+carpoolRouter.get("/:id", verifyAuth, carpoolController.getCarpoolRoomById);
 /* 카풀 방 생성 */
-carpoolRouter.post("/", carpoolController.createCarpoolRoom);
+carpoolRouter.post("/", verifyAuth, carpoolController.createCarpoolRoom);
 /* 남은 카풀 좌석 업데이트, 도착 여부 업데이트 */
-carpoolRouter.post("/update/:id", carpoolController.updateCarpoolRoom);
+carpoolRouter.post("/update/:id", verifyAuth, carpoolController.updateCarpoolRoom);
+/* 카풀 방 참여 */
+carpoolRouter.post("/join", verifyAuth, carpoolController.joinCarpoolRoom);
+/* 카풀 방 나가기 */
+carpoolRouter.post("/leave", verifyAuth, carpoolController.leaveCarpoolRoom);
 /* 카풀 방 삭제 */
-carpoolRouter.post("/delete/:id", carpoolController.deleteCarpoolRoom);
-
-/* 카풀 방 참여, 채팅방 생성 코드는 레포지토리만 분리하고 나머지는 통합해도 될듯. (route는 물론 controller, service까지도.) */
+carpoolRouter.post("/delete/:id", verifyAuth, carpoolController.deleteCarpoolRoom);
 
 export default carpoolRouter;
