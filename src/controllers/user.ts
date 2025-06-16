@@ -9,7 +9,9 @@ import {
   checkUserDto,
   updateUserDto,
   resetPasswordDto,
-  updateGroupDto
+  updateGroupDto,
+  updateNameDto,
+  updatePhoneDto,
 } from '@dtos/authDto';
 import logger from '@utils/logger';
 
@@ -254,6 +256,44 @@ class UserController {
         message: err.message,
         err: err
       });
+    }
+  }
+
+  async updateUserName(req: Request, res: Response) {
+    try {
+      const dto: updateNameDto = req.body;
+
+      const result: any = await userService.updateUserName(dto);
+
+      if (result.ok) {
+        return res.status(200).json({
+          message: "update name success",
+          user: result.user,
+        });
+      }
+      return res.status(400).json({ message: result.message });
+
+    } catch (err: any) {
+      return res.status(500).json({ message: err.message, err: err });
+    }
+  }
+
+  async updateUserPhone(req: Request, res: Response) {
+    try {
+      const dto: updatePhoneDto = req.body;
+
+      const result: any = await userService.updateUserPhone(dto);
+
+      if (result.ok) {
+        return res.status(200).json({
+          message: "update phone success",
+          user: result.user,
+        });
+      }
+      return res.status(400).json({ message: result.message });
+
+    } catch (err: any) {
+      return res.status(500).json({ message: err.message, err: err });
     }
   }
 }

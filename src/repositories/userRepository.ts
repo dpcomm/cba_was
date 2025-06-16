@@ -1,4 +1,4 @@
-import { requestRegisterUserDto, updateGroupDto, updateUserDto } from '@dtos/authDto';
+import { requestRegisterUserDto, updateUserDto, updateGroupDto, updateNameDto, updatePhoneDto } from '@dtos/authDto';
 import { PrismaClient } from '@prisma/client'
 
 
@@ -64,6 +64,24 @@ class UserRepository {
       where: {userId: groupDTO.userId},
       data: {
         group: groupDTO.group
+      },
+    });
+  }
+
+  async updateUserName(nameDTO: updateNameDto) {
+    return await prisma.user.update({
+      where: {id: nameDTO.id},
+      data: {
+        name: nameDTO.name
+      },
+    });
+  }
+
+  async updateUserPhone(phoneDTO: updatePhoneDto) {
+    return await prisma.user.update({
+      where: {id: phoneDTO.id},
+      data: {
+        phone: phoneDTO.phone
       },
     });
   }
