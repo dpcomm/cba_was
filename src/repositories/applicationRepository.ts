@@ -42,9 +42,10 @@ class ApplicationRepository {
       isLeader: data.surveyData.isLeader,
       title: data.retreat.title,
       userId: data.user.userId,
-      // transfer: data.surveyData.transfer.transfer,
-      // ownCar: data.surveyData.transfer['own-car'],
-      // bus: data.surveyData.transfer.bus,
+      meal: data.surveyData.meal,
+      transfer: data.surveyData.transfer.transfer,
+      ownCar: data.surveyData.transfer['own-car'],
+      bus: data.surveyData.transfer.bus,
     }));
   }
 

@@ -16,7 +16,7 @@ class DashboardRepository {
             },
         });
 
-        const allowedGroups = ['반일섭M', '노시은M', '권수영M', '대청2부'];
+        const allowedGroups = ['배윤희&김준영M', '노시은&윤승오M', '권수영&임강미M', '가족실','예배당(기관)'];
 
         const result = groupCounts.map((groupCount: { group: string; _count: { userId: number } }): GroupCount => {
             const groupName = allowedGroups.includes(groupCount.group) ? groupCount.group : '기타';
