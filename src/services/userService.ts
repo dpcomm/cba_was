@@ -1,4 +1,4 @@
-import { requestAuthCheckDto, requestLoginUserDto, requestLogoutUserDto, requestRefreshAccessTokenDto, requestRegisterUserDto, checkUserDto, updateUserDto, resetPasswordDto, updateGroupDto } from "@dtos/authDto";
+import { requestAuthCheckDto, requestLoginUserDto, requestLogoutUserDto, requestRefreshAccessTokenDto, requestRegisterUserDto, checkUserDto, updateUserDto, resetPasswordDto, updateGroupDto, updateNameDto, updatePhoneDto } from "@dtos/authDto";
 import bcrypt from "bcrypt";
 import { user } from "@/types/default";
 import UserRepository from "@repositories/userRepository";
@@ -330,6 +330,50 @@ class UserService {
       return {
         ok: 1,
         message: "Update group success"
+      };
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async updateUserName (nameDTO: updateNameDto) {
+    try {
+      const user: user | null = await userRepository.findUserById(nameDTO.id);
+
+      if (!user) {
+        return {
+          ok: 0,
+          message: "User not exist"
+        };
+      }
+
+      await userRepository.updateUserName(nameDTO);
+
+      return {
+        ok: 1,
+        message: "Update name success",
+      };
+    } catch (err) {
+      throw err;
+    }
+  }
+
+    async updateUserPhone (phoneDTO: updatePhoneDto) {
+    try {
+      const user: user | null = await userRepository.findUserById(phoneDTO.id);
+      
+      if (!user) {
+        return {
+          ok: 0,
+          message: "User not exist"
+        };
+      }
+
+      await userRepository.updateUserPhone(phoneDTO);
+
+      return {
+        ok: 1,
+        message: "Update phone success"
       };
     } catch (err) {
       throw err;

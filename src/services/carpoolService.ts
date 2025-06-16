@@ -44,6 +44,31 @@ class CarpoolService {
     }
   }
 
+  async findMyCarpoolRooms(userId: number) {
+    try {
+      const rooms = await this.carpoolRoomRepository.findMyCarpools(userId);
+      
+      if (!rooms || rooms.length === 0) {
+        return {
+          ok: 0,
+          message: 'No carpool rooms found',
+          rooms: []
+        };
+      }
+      return {
+        ok: 1,
+        message: 'findMyCarpoolRooms success',
+        rooms
+      };     
+    } catch (error) {
+      console.error('findMyCarpoolRooms error:', error);
+      return { 
+        ok: 0, 
+        message: '마이 카풀 목록을 조회하는 중 오류 발생'
+      };
+    }
+  }
+
   /* 아마 이때 채팅방 열어어 할 듯. */
   async createCarpoolRoom(dto: CreateCarpoolDto) {
     try {

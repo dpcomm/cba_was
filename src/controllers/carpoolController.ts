@@ -11,6 +11,7 @@ class CarpoolController {
   constructor() {
     this.getAllCarpoolRooms = this.getAllCarpoolRooms.bind(this);
     this.getCarpoolRoomById = this.getCarpoolRoomById.bind(this);
+    this.getMyCarpoolRooms = this.getMyCarpoolRooms.bind(this);
     this.createCarpoolRoom = this.createCarpoolRoom.bind(this);
     this.updateCarpoolRoom = this.updateCarpoolRoom.bind(this);
     this.deleteCarpoolRoom = this.deleteCarpoolRoom.bind(this);
@@ -53,6 +54,31 @@ class CarpoolController {
       return res.status(404).json({ message: result.message });
     } catch (err: any) {
       logger.error('CarpoolController#getCarpoolById error:', err);
+      return res.status(500).json({ message: err.message, err });
+    }
+  }
+
+  async getMyCarpoolRooms(req: Request, res: Response) {
+    try {
+      const userId = Number(req.query.userId);
+
+      if (isNaN(userId)) {
+        return res.status(400).json({ message: '유효한 userId가 필요합니다.' });
+      }
+    
+      const result: any = await this.carpoolService.findMyCarpoolRooms(userId); 
+
+      if (result.ok) {
+        logger.http(`getMyCarpoolRooms(userId: ${userId})`);
+        return res.status(200).json({
+          message: 'Success getMyCarpoolRooms',
+          rooms: result.rooms,
+        });
+      }
+
+      return res.status(404).json({ message: result.message });
+    } catch (err: any) {
+      logger.error('CarpoolController#getMyCarpoolRooms error:', err);
       return res.status(500).json({ message: err.message, err });
     }
   }

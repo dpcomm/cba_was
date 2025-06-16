@@ -5,6 +5,9 @@ import verifyAuth from "@middlewares/verifyAuth";
 const carpoolRouter = express.Router();
 const carpoolController = new CarpoolController();
 
+/* 마이카풀 리스트 전체 조회 */
+carpoolRouter.get("/my", carpoolController.getMyCarpoolRooms);
+
 /* 카풀 리스트 전체 출력 */
 carpoolRouter.get("/", carpoolController.getAllCarpoolRooms);
 /* 상세 카풀 방 조회 */

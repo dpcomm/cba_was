@@ -44,6 +44,33 @@ export default class CarpoolRoomRepository {
     });
   }
 
+  async findMyCarpools(userId: number): Promise<CarpoolRoom[]> {
+    return prisma.carpoolRoom.findMany({
+      where: {
+        OR: [
+          { driverId: userId }, // 사용자가 해당 카풀의 운전자인 경우
+          {
+            members: { // 사용자가 CarpoolMember로 참여하고 있는 경우 (CarpoolMember 테이블 조인)
+              some: { // '어떤' CarpoolMember라도 해당 userId를 가지는지 확인
+                userId: userId,
+              },
+            },
+          },
+        ],
+      },
+      orderBy: { departureTime: 'asc' }, // 출발 시간 기준으로 정렬
+      include: {
+        driver: { select: { id: true, name: true, phone: true, } }, // 운전자 정보 포함
+        // 추가로 멤버 정보 가져오기
+        members: {
+          include: {
+            user: { select: { id: true, name: true, phone: true, } }
+          }
+        }
+      },
+    });
+  }
+
   async create(dto: CreateCarpoolDto): Promise<CarpoolRoom> {
     return prisma.carpoolRoom.create({
       data: {
