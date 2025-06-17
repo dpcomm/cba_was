@@ -14,9 +14,12 @@ const EVENTS = {
   DISCONNECT: 'disconnect',
 }
 
+let defaultIO: Server;
+
 const jwtProvider = new JwtProvider();
 
 export function setupSocketEvents(io: Server) {
+  defaultIO = io;
   io.use(async (socket, next) => {
     console.log("connection request")
     const raw = socket.handshake.headers['authorization'];
@@ -44,4 +47,9 @@ export function setupSocketEvents(io: Server) {
     socket.on(EVENTS.CHAT, async (chatDTO: chatDto, callback) => socketHandlers.handleChat(socket, chatDTO, callback));
     socket.on(EVENTS.DISCONNECT, () => socketHandlers.handleDisconnect(socket));
   });
+}
+
+export function getIO() {
+  if (!defaultIO) throw new Error('Socket.io not initialized');
+  return defaultIO;
 }
