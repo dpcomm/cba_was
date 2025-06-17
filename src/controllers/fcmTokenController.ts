@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
 import FcmService from '@services/fcmService';
-import { requestRefreshTokenDto, requestRegistTokenDto, requestDeleteTokenDto } from '@dtos/fcmDto';
+import { requestRefreshTokenDto, requestRegistTokenDto, requestDeleteTokenDto } from '@dtos/fcmTokenDto';
 import logger from '@utils/logger';
 
 const fcmService = new FcmService();
 
-class FcmController {
+class FcmTokenController {
     async registToken(req: Request, res: Response) {
         try {
             const tokenDTO: requestRegistTokenDto = req.body;
@@ -98,4 +98,4 @@ class FcmController {
     }
 }
 
-export default FcmController;
+export default FcmTokenController;

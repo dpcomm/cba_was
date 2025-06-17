@@ -1,11 +1,10 @@
 import { chatDto } from "@dtos/chatDto";
 import { MulticastMessage, getMessaging } from "firebase-admin/messaging";
 import redisClient from '@utils/redis';
-import FcmRepository from "@repositories/fcmRepository";
-import { raw } from "body-parser";
-import { requestRegistTokenDto, requestDeleteTokenDto } from "@dtos/fcmDto";
+import FcmTokenRepository from "@repositories/fcmTokenRepository";
+import { requestRegistTokenDto, requestDeleteTokenDto } from "@dtos/fcmTokenDto";
 
-const fcmRepository = new FcmRepository();
+const fcmTokenRepository = new FcmTokenRepository();
 
 class FcmService {
     async sendNotificationMessage(roomId: number, chat: chatDto) {
@@ -86,7 +85,7 @@ class FcmService {
     async setFirebaseToken(userId: number) {
         try {
             const hashKey = "userFirebaseToken";
-            const tokens = fcmRepository.getTokens(userId);
+            const tokens = fcmTokenRepository.getTokens(userId);
 
             await redisClient.hSet(hashKey, userId.toString(), JSON.stringify(tokens));
         } catch (err: any) {
@@ -151,7 +150,7 @@ class FcmService {
                 });
             }
 
-            await fcmRepository.registToken(tokenDTO);
+            await fcmTokenRepository.registToken(tokenDTO);
             return ({
                 ok: 1,
                 message: "Token Resigter success",
@@ -173,7 +172,7 @@ class FcmService {
                 });
             }
 
-            const result = await fcmRepository.deleteToken(tokenDTO.token);
+            const result = await fcmTokenRepository.deleteToken(tokenDTO.token);
             return ({
                 ok: 1,
                 message: "Token remove success",

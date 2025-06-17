@@ -1,9 +1,9 @@
-import { requestRegistTokenDto } from '@dtos/fcmDto';
+import { requestRegistTokenDto } from '@dtos/fcmTokenDto';
 import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient();
 
-class FcmRepository {
+class FcmTokenRepository {
     async registToken(tokenDTO: requestRegistTokenDto){
         return await prisma.fcmToken.create({
             data: {
@@ -38,4 +38,4 @@ class FcmRepository {
     }
 }
 
-export default FcmRepository;
+export default FcmTokenRepository;

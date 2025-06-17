@@ -1,11 +1,11 @@
-import FcmController from "@controllers/fcmController";
+import FcmTokenController from "@controllers/fcmTokenController";
 import express from "express";
 
 const fcmRouter = express.Router();
-const fcmController = new FcmController();
+const fcmTokenController = new FcmTokenController();
 
-fcmRouter.post('/regist', fcmController.registToken);
-fcmRouter.post('/delete', fcmController.deleteToken);
-fcmRouter.post('/refresh', fcmController.refreshToken);
+fcmRouter.post('/regist', fcmTokenController.registToken);
+fcmRouter.post('/delete', fcmTokenController.deleteToken);
+fcmRouter.post('/refresh', fcmTokenController.refreshToken);
 
 export default fcmRouter;
