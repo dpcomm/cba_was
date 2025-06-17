@@ -141,6 +141,7 @@ class CarpoolService {
       };
     }
     await this.carpoolMemberRepository.addMember(userId, roomId);
+    await this.carpoolRoomRepository.decrementSeatsLeft(roomId);
 
     //redis에 member 추가
     const existing = await redisClient.hGet("carpoolMember", roomId.toString());
@@ -170,6 +171,7 @@ class CarpoolService {
   async leaveCarpoolRoom(userId: number, roomId: number) {
     try {
       await this.carpoolMemberRepository.removeMember(userId, roomId);
+      await this.carpoolRoomRepository.incrementSeatsLeft(roomId);
 
       //redis에 member 제거
       const existing = await redisClient.hGet("carpoolMember", roomId.toString());

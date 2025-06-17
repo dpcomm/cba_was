@@ -114,6 +114,26 @@ export default class CarpoolRoomRepository {
     });
   }
 
+  async decrementSeatsLeft(roomId: number, amount = 1): Promise<CarpoolRoom> {
+    return prisma.carpoolRoom.update({
+      where: { id: roomId },
+      data: {
+        seatsLeft: { decrement: amount },
+        isArrived: false,
+      },
+    });
+  }
+
+  async incrementSeatsLeft(roomId: number, amount = 1): Promise<CarpoolRoom> {
+    return prisma.carpoolRoom.update({
+      where: { id: roomId },
+      data: {
+        seatsLeft: { increment: amount },
+        isArrived: false,
+      },
+    });
+  }
+
   async delete(id: number): Promise<CarpoolRoom> {
     return prisma.carpoolRoom.delete({ where: { id } });
   }
