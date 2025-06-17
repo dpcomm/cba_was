@@ -1,4 +1,6 @@
 import { CreateCarpoolDto, UpdateCarpoolDto } from "@dtos/carpoolDto";
+import { getIO } from "@socket/socket";
+import redisClient from "@utils/redis";
 import CarpoolMemberRepository from "@repositories/carpoolMemberRepository";
 import CarpoolRoomRepository from "@repositories/carpoolRoomRepository";
 
@@ -139,6 +141,26 @@ class CarpoolService {
       };
     }
     await this.carpoolMemberRepository.addMember(userId, roomId);
+
+    //redis에 member 추가
+    const existing = await redisClient.hGet("carpoolMember", roomId.toString());
+    let members: number[] = [];
+
+    if (existing) { members = JSON.parse(existing); }
+    members.push(userId);
+    await redisClient.hSet("carpoolMember", roomId.toString(), JSON.stringify(members));   
+
+
+    //socket room join
+    const IO = getIO();
+    const socketId = await redisClient.hGet("userToSocket", userId.toString());
+    if (socketId) { 
+      const socket = IO.sockets.sockets.get(socketId); 
+      socket?.join(`chatroom:${roomId}`);
+      console.log(`${userId} join to chatroom:${roomId}`);
+    }
+
+
     return {
       ok: 1,
       message: 'joinCarpool success'
@@ -148,6 +170,26 @@ class CarpoolService {
   async leaveCarpoolRoom(userId: number, roomId: number) {
     try {
       await this.carpoolMemberRepository.removeMember(userId, roomId);
+
+      //redis에 member 제거
+      const existing = await redisClient.hGet("carpoolMember", roomId.toString());
+      let members: number[] = [];
+
+      if (existing) { members = JSON.parse(existing); }
+      const result = members.filter(m => m !== userId);
+      await redisClient.hSet("carpoolMember", userId.toString(), JSON.stringify(result));
+
+
+      //socket room leave
+      const IO = getIO();
+      const socketId = await redisClient.hGet("userToSocket", userId.toString());
+      if (socketId) { 
+        const socket = IO.sockets.sockets.get(socketId); 
+        socket?.leave(`chatroom:${roomId}`);
+        console.log(`${userId} leave to chatroom:${roomId}`);
+      }
+
+
       return {
         ok: 1,
         message: 'leaveCarpool success'

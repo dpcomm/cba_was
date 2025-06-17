@@ -1,14 +1,19 @@
 import { Socket } from "socket.io";
 import redisClient from "@utils/redis";
 import CarpoolMemberRepository from "@repositories/carpoolMemberRepository";
+import UserRepository from "@repositories/userRepository";
 
 const carpoolMemberRepository = new CarpoolMemberRepository();
+const userRepository = new UserRepository();
 
 export default async function (socket: Socket, userId: number, callback?: Function) {
     try {
         
         await redisClient.hSet("userToSocket", String(userId), socket.id);
         await redisClient.hSet("socketToUser", socket.id, String(userId));
+
+        const user: any = await userRepository.findUserById(userId);
+        await redisClient.hSet("userInfo", String(userId), JSON.stringify(user));
 
         const carpools: number[] = await carpoolMemberRepository.findGroupsByUserId(userId);
         for (const carpool of carpools) {

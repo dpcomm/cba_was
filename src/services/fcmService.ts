@@ -2,6 +2,8 @@ import { chatDto } from "@dtos/chatDto";
 import { MulticastMessage, getMessaging } from "firebase-admin/messaging";
 import redisClient from '@utils/redis';
 import FcmRepository from "@repositories/fcmRepository";
+import { raw } from "body-parser";
+import { requestRegistTokenDto, requestDeleteTokenDto } from "@dtos/fcmDto";
 
 const fcmRepository = new FcmRepository();
 
@@ -27,21 +29,33 @@ class FcmService {
             throw err;            
         }
         
-    }
+    }  
 
-    private sendMessage(tokens: string[], chat: chatDto){
+    private async sendMessage(tokens: string[], chat: chatDto){
         try {
+            const rawSender = await redisClient.hGet("userInfo", chat.senderId.toString());
+            var senderName;
+
+            if (rawSender) { senderName = JSON.parse(rawSender)['name']; }
+
             const message: MulticastMessage = {
                 tokens : tokens, 
-                notification: {
+                data: {
+                    roomId: `${chat.roomId}`,
                     title: `New message in Room ${chat.roomId}`,
-                    body: `${chat.senderId}: ${chat.message}`,
+                    body: `${senderName}: ${chat.message}`,       
+                    channelId: "chat_channel",
                 },
+                // notification: {
+                //     title: `New message in Room ${chat.roomId}`,
+                //     body: `${chat.senderId}: ${chat.message}`,
+                // },
                 android: {
                     collapseKey: chat.roomId.toString(),
-                    notification: {
-                        clickAction: "OPEN_CHATROOM",
-                    },
+                    // notification: {
+                    //     channelId: "chat_channel",
+                    //     clickAction: "OPEN_CHATROOM",
+                    // },
                 }, 
                 apns: {
                     headers: {
@@ -68,6 +82,7 @@ class FcmService {
         }
     }
 
+    //set tokens from redis
     async setFirebaseToken(userId: number) {
         try {
             const hashKey = "userFirebaseToken";
@@ -80,6 +95,7 @@ class FcmService {
 
     }
 
+    //get tokens from redis
     async getFirebaseToken(userId: number) {
         try {
             const hashKey = "userFirebaseToken";
@@ -91,6 +107,7 @@ class FcmService {
         }
     }
 
+    //append token to redis
     async addFirebaseToken(userId: number, token: string) {
         try {
             const hashKey = "userFirebaseToken";
@@ -102,6 +119,69 @@ class FcmService {
             tokens.push(token);
             await redisClient.hSet(hashKey, userId.toString(), JSON.stringify(tokens));
         } catch (err: any) {
+            throw err;
+        }
+    }
+
+    //remove token to redis
+    async removeFirebaseToken(userId: number, token: string) {
+        try {
+            const hashKey = "userFirebaseToken";
+
+            const existing = await redisClient.hGet(hashKey, userId.toString());
+            let tokens: string[] = [];
+
+            if (existing) { tokens = JSON.parse(existing); }
+            const result = tokens.filter(t => t !== token);
+            await redisClient.hSet(hashKey, userId.toString(), JSON.stringify(result));
+
+        } catch (err: any) {
+            throw err;
+        }
+    }
+
+    //regist token to DB
+    async registToken(tokenDTO: requestRegistTokenDto) {
+        try {
+            //token 유효성 검사 필요
+            if (!tokenDTO) {
+                return ({
+                    ok: 0,
+                    message: "Invalid request"
+                });
+            }
+
+            await fcmRepository.registToken(tokenDTO);
+            return ({
+                ok: 1,
+                message: "Token Resigter success",
+                userId: tokenDTO.userId,
+                token: tokenDTO.token,
+            });
+        } catch (err) {
+            throw err;
+        }
+    }
+
+    //remove token to DB
+    async deleteToken(tokenDTO: requestDeleteTokenDto) {
+        try {
+            if (!tokenDTO) {
+                return ({
+                    ok: 0,
+                    message: "Invalid request"
+                });
+            }
+
+            const result = await fcmRepository.deleteToken(tokenDTO.token);
+            return ({
+                ok: 1,
+                message: "Token remove success",
+                userId: result.userId,
+                token: result.token,
+            });
+
+        } catch (err) {
             throw err;
         }
     }
