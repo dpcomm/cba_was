@@ -22,7 +22,6 @@ class CarpoolController {
     try {
       console.log('getAllCarpools called');
       const result: any = await this.carpoolService.getAllCarpoolRooms();
-      console.log("결과", result);
       if (result.ok) {
         logger.http('getAllCarpools');
         return res.status(200).json({
@@ -30,7 +29,13 @@ class CarpoolController {
           rooms: result.rooms,
         });
       }
-
+      if (result.message === 'No carpool rooms found') {
+        logger.http('getAllCarpools');
+        return res.status(200).json({
+          message: result.message,
+          rooms: result.rooms
+        });
+      }
       return res.status(404).json({ message: result.message });
     } catch (err: any) {
       logger.error('CarpoolController#getAllCarpools error:', err);
