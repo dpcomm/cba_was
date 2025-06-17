@@ -1,13 +1,14 @@
+import { requestRegistTokenDto } from '@dtos/fcmDto';
 import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient();
 
 class FcmRepository {
-    async saveToken(userId: number, token: string){
+    async registToken(tokenDTO: requestRegistTokenDto){
         return await prisma.fcmToken.create({
             data: {
-                userId: userId,
-                token: token,
+                userId: tokenDTO.userId,
+                token: tokenDTO.token,
             }
         });
     }
@@ -28,7 +29,13 @@ class FcmRepository {
 
         return result.map(e => e.token);
     }
-
+    async findToken(token: string) {
+        return await prisma.fcmToken.findUnique({
+            where: {
+                token: token,
+            }
+        });
+    }
 }
 
 export default FcmRepository;
