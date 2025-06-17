@@ -15,6 +15,7 @@ import { setupSocketEvents } from "@socket/socket";
 import "@utils/cron";
 import carpoolRouter from "@routes/carpool";
 import "@firebase/firebaseAdmin";
+import fcmRouter from "@routes/fcmToken";
 
 dotenv.config();
 const app = express();
@@ -39,6 +40,7 @@ app.use("/api/youtube", youtubeRouter);
 app.use("/api/pray", prayRouter);
 app.use("/api/dashboard", dashboardRouter);
 app.use("/api/carpool", carpoolRouter);
+app.use("/api/fcm", fcmRouter);
 
 //previous version - only used express
 // app.listen(process.env.SERVER_PORT, () => {
