@@ -15,12 +15,13 @@ class CarpoolController {
     this.createCarpoolRoom = this.createCarpoolRoom.bind(this);
     this.updateCarpoolRoom = this.updateCarpoolRoom.bind(this);
     this.deleteCarpoolRoom = this.deleteCarpoolRoom.bind(this);
+    this.joinCarpoolRoom = this.joinCarpoolRoom.bind(this);
+    this.leaveCarpoolRoom = this.leaveCarpoolRoom.bind(this);
   }
   private carpoolService = new CarpoolService();
 
   async getAllCarpoolRooms(req: Request, res: Response) {
     try {
-      console.log('getAllCarpools called');
       const result: any = await this.carpoolService.getAllCarpoolRooms();
       if (result.ok) {
         logger.http('getAllCarpools');
