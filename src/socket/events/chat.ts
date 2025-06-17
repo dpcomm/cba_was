@@ -1,6 +1,9 @@
 import { Socket } from "socket.io";
 import { chatDto } from "@dtos/chatDto";
 import redisClient from "@utils/redis";
+import FcmService from "@services/fcmService";
+
+const fcmService = new FcmService();
 
 export default async function(socket: Socket, chatDTO: chatDto, callback: Function) {
     try {
@@ -30,6 +33,8 @@ export default async function(socket: Socket, chatDTO: chatDto, callback: Functi
         
         //
         socket.to('chatroom:' + chatDTO.roomId).emit("chat", chat);
+
+        fcmService.sendNotificationMessage(chatDTO);
 
         const result = {
             success: true,

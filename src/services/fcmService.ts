@@ -7,9 +7,9 @@ import { requestRegistTokenDto, requestDeleteTokenDto } from "@dtos/fcmTokenDto"
 const fcmTokenRepository = new FcmTokenRepository();
 
 class FcmService {
-    async sendNotificationMessage(roomId: number, chat: chatDto) {
+    async sendNotificationMessage(chat: chatDto) {
         try {
-            const result = await redisClient.hGet("carpoolMember", roomId.toString());
+            const result = await redisClient.hGet("carpoolMember", chat.roomId.toString());
             let memberList: number[] = [];
             if (result) {memberList = JSON.parse(result)}
 
