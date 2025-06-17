@@ -10,7 +10,6 @@ class CarpoolService {
 
   async getAllCarpoolRooms() {
     try {
-      console.log('getAllCarpoolasdf called');
       const rooms = await this.carpoolRoomRepository.findAll();
       if (!rooms || rooms.length === 0) {
         return {
