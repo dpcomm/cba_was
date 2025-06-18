@@ -16,6 +16,7 @@ import "@utils/cron";
 import carpoolRouter from "@routes/carpool";
 import "@firebase/firebaseAdmin";
 import fcmRouter from "@routes/fcmToken";
+import statusRouter from "@routes/status";
 
 dotenv.config();
 const app = express();
@@ -34,6 +35,7 @@ setupSocketEvents(io);
 app.use(cors());
 app.use(bodyParser.json());
 
+app.use("/api/status", statusRouter)
 app.use("/api/user", userRouter);
 app.use("/api/application", applicationRouter);
 app.use("/api/youtube", youtubeRouter);
