@@ -1,5 +1,5 @@
 import { PrismaClient, CarpoolRoom } from '@prisma/client';
-import { CreateCarpoolDto, UpdateCarpoolDto } from '@dtos/carpoolDto';
+import { CarpoolRoomDetailDto, CreateCarpoolDto, UpdateCarpoolDto } from '@dtos/carpoolDto';
 
 const prisma = new PrismaClient();
 
@@ -44,32 +44,77 @@ export default class CarpoolRoomRepository {
     });
   }
 
-  async findMyCarpools(userId: number): Promise<CarpoolRoom[]> {
-    return prisma.carpoolRoom.findMany({
-      where: {
-        OR: [
-          { driverId: userId }, // 사용자가 해당 카풀의 운전자인 경우
-          {
-            members: { // 사용자가 CarpoolMember로 참여하고 있는 경우 (CarpoolMember 테이블 조인)
-              some: { // '어떤' CarpoolMember라도 해당 userId를 가지는지 확인
-                userId: userId,
-              },
-            },
-          },
-        ],
-      },
-      orderBy: { departureTime: 'asc' }, // 출발 시간 기준으로 정렬
+  async findDetailById(id: number): Promise<CarpoolRoomDetailDto | null> {
+    const room = await prisma.carpoolRoom.findUnique({
+      where: { id },
       include: {
-        driver: { select: { id: true, name: true, phone: true, } }, // 운전자 정보 포함
-        // 추가로 멤버 정보 가져오기
+        driver: { select: { id: true, name: true, phone: true } },
         members: {
           include: {
-            user: { select: { id: true, name: true, phone: true, } }
+            user: { select: { id: true, name: true, phone: true } }
           }
         }
-      },
+      }
     });
+
+    if (!room) return null;
+
+    return {
+      id: room.id,
+      driverId: room.driverId,
+      carInfo: room.carInfo,
+      departureTime: room.departureTime,
+      origin: room.origin,
+      originDetailed: room.originDetailed,
+      destination: room.destination,
+      destinationDetailed: room.destinationDetailed,
+      seatsTotal: room.seatsTotal,
+      seatsLeft: room.seatsLeft,
+      note: room.note,
+      originLat: room.originLat?.toNumber() ?? null,
+      originLng: room.originLng?.toNumber() ?? null,
+      destLat: room.destLat?.toNumber() ?? null,
+      destLng: room.destLng?.toNumber() ?? null,
+      isArrived: room.isArrived,
+      createdAt: room.createdAt,
+      updatedAt: room.updatedAt,
+      driver: {
+        id: room.driver.id,
+        name: room.driver.name,
+        phone: room.driver.phone,
+      },
+      members: room.members.map(m => ({
+        userId: m.user.id,
+        name: m.user.name,
+        phone: m.user.phone,
+      })),
+    };
   }
+
+  async findMyCarpools(userId: number): Promise<CarpoolRoom[]> {
+  return prisma.carpoolRoom.findMany({
+    where: {
+      members: {
+        some: {
+          userId: userId
+        }
+      }
+    },
+    orderBy: { departureTime: 'asc' },
+    include: {
+      driver: {
+        select: { id: true, name: true, phone: true }
+      },
+      members: {
+        include: {
+          user: {
+            select: { id: true, name: true, phone: true }
+          }
+        }
+      }
+    }
+  });
+}
 
   async create(dto: CreateCarpoolDto): Promise<CarpoolRoom> {
     return prisma.carpoolRoom.create({
@@ -91,6 +136,31 @@ export default class CarpoolRoomRepository {
       },
     });
   }
+
+  async edit(id: number, dto: UpdateCarpoolDto): Promise<CarpoolRoom> {
+    const existing = await prisma.carpoolRoom.findUniqueOrThrow({ where: { id } });
+
+    return prisma.carpoolRoom.update({
+      where: { id },
+      data: {
+        carInfo: dto.carInfo ?? existing.carInfo,
+        departureTime: dto.departureTime ?? existing.departureTime,
+        origin: dto.origin ?? existing.origin,
+        originDetailed: dto.originDetailed ?? existing.originDetailed,
+        destination: dto.destination ?? existing.destination,
+        destinationDetailed: dto.destinationDetailed ?? existing.destinationDetailed,
+        seatsTotal: dto.seatsTotal ?? existing.seatsTotal,
+        seatsLeft: dto.seatsLeft ?? existing.seatsLeft,
+        note: dto.note ?? existing.note,
+        originLat: dto.originLat ?? existing.originLat,
+        originLng: dto.originLng ?? existing.originLng,
+        destLat: dto.destLat ?? existing.destLat,
+        destLng: dto.destLng ?? existing.destLng,
+        isArrived: dto.isArrived ?? existing.isArrived,
+      },
+    });
+  }
+
 
   async update(id: number, dto: UpdateCarpoolDto): Promise<CarpoolRoom> {
     return prisma.carpoolRoom.update({

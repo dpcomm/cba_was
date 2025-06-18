@@ -4,6 +4,7 @@ import logger from '@utils/logger';
 import CarpoolService from '@services/carpoolService';
 import {
   CreateCarpoolDto,
+  UpdateCarpoolInfoDto,
   UpdateCarpoolDto,
 } from '@dtos/carpoolDto';
 
@@ -11,8 +12,10 @@ class CarpoolController {
   constructor() {
     this.getAllCarpoolRooms = this.getAllCarpoolRooms.bind(this);
     this.getCarpoolRoomById = this.getCarpoolRoomById.bind(this);
+    this.getCarpoolRoomDetail = this.getCarpoolRoomDetail.bind(this);
     this.getMyCarpoolRooms = this.getMyCarpoolRooms.bind(this);
     this.createCarpoolRoom = this.createCarpoolRoom.bind(this);
+    this.editCarpoolRoom = this.editCarpoolRoom.bind(this);
     this.updateCarpoolRoom = this.updateCarpoolRoom.bind(this);
     this.deleteCarpoolRoom = this.deleteCarpoolRoom.bind(this);
     this.joinCarpoolRoom = this.joinCarpoolRoom.bind(this);
@@ -64,24 +67,51 @@ class CarpoolController {
     }
   }
 
+  async getCarpoolRoomDetail(req: Request, res: Response) {
+    try {
+      const id = Number(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: 'Invalid carpool room ID' });
+      }
+
+      const result: any = await this.carpoolService.getCarpoolRoomDetail(id);
+      if (result.ok) {
+        return res.status(200).json({
+          message: result.message,
+          room: result.room,
+        });
+      }
+      return res.status(404).json({ message: result.message });
+    } catch (err: any) {
+      logger.error('CarpoolController#getCarpoolRoomDetail error:', err);
+      return res.status(500).json({ message: err.message, err });
+    }
+  }
+
   async getMyCarpoolRooms(req: Request, res: Response) {
     try {
-      const userId = Number(req.query.userId);
+      const userId = Number(req.params.userId);
 
       if (isNaN(userId)) {
-        return res.status(400).json({ message: '유효한 userId가 필요합니다.' });
+        return res.status(400).json({ message: 'Invalid userId' });
       }
-    
-      const result: any = await this.carpoolService.findMyCarpoolRooms(userId); 
+
+      const result: any = await this.carpoolService.findMyCarpoolRooms(userId);
 
       if (result.ok) {
-        logger.http(`getMyCarpoolRooms(userId: ${userId})`);
+        logger.http(`getMyCarpoolRooms(${userId})`);
         return res.status(200).json({
           message: 'Success getMyCarpoolRooms',
           rooms: result.rooms,
         });
       }
-
+      if (result.message === 'No carpool rooms found') {
+        logger.http('getMyCarpoolRooms');
+        return res.status(200).json({
+          message: result.message,
+          rooms: result.rooms
+        })
+      }
       return res.status(404).json({ message: result.message });
     } catch (err: any) {
       logger.error('CarpoolController#getMyCarpoolRooms error:', err);
@@ -105,6 +135,27 @@ class CarpoolController {
       return res.status(400).json({ message: result.message });
     } catch (err: any) {
       logger.error('CarpoolController#createCarpool error:', err);
+      return res.status(500).json({ message: err.message, err });
+    }
+  }
+
+  async editCarpoolRoom(req: Request, res: Response) {
+    try {
+      const id = Number(req.params.id);
+      const dto: UpdateCarpoolInfoDto = req.body;
+      const result: any = await this.carpoolService.editCarpoolRoom(id, dto);
+
+      if (result.ok) {
+        logger.http(`editCarpool(${id})`);
+        return res.status(200).json({
+          message: 'Success editCarpool',
+          room: result.room,
+        });
+      }
+
+      return res.status(400).json({ message: result.message });
+    } catch (err: any) {
+      logger.error('CarpoolController#editCarpool error:', err);
       return res.status(500).json({ message: err.message, err });
     }
   }

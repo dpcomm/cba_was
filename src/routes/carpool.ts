@@ -5,15 +5,18 @@ import verifyAuth from "@middlewares/verifyAuth";
 const carpoolRouter = express.Router();
 const carpoolController = new CarpoolController();
 
-/* 마이카풀 리스트 전체 조회 */
-carpoolRouter.get("/my", carpoolController.getMyCarpoolRooms);
-
 /* 카풀 리스트 전체 출력 */
 carpoolRouter.get("/", verifyAuth, carpoolController.getAllCarpoolRooms);
 /* 상세 카풀 방 조회 */
 carpoolRouter.get("/:id", verifyAuth, carpoolController.getCarpoolRoomById);
+/* 상세 카풀 방 + 참여자 목록 조회 */
+carpoolRouter.get("/detail/:id", verifyAuth, carpoolController.getCarpoolRoomDetail);
+/* 마이카풀 리스트 전체 조회 */
+carpoolRouter.get("/my/:userId", carpoolController.getMyCarpoolRooms);
 /* 카풀 방 생성 */
 carpoolRouter.post("/", verifyAuth, carpoolController.createCarpoolRoom);
+/* 카풀 정보 수정 */
+carpoolRouter.post("/edit/:id", verifyAuth, carpoolController.editCarpoolRoom);
 /* 남은 카풀 좌석 업데이트, 도착 여부 업데이트 */
 carpoolRouter.post("/update/:id", verifyAuth, carpoolController.updateCarpoolRoom);
 /* 카풀 방 참여 */

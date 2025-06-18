@@ -50,6 +50,25 @@ class CarpoolService {
     }
   }
 
+  async getCarpoolRoomDetail(id: number) {
+    try {
+      const detail = await this.carpoolRoomRepository.findDetailById(id);
+      if (!detail) {
+        return {
+          ok: 0,
+          message: `Carpool ${id} not found`
+        };
+      }
+      return {
+        ok: 1,
+        message: 'getCarpoolRoomDetail success',
+        room: detail
+      };
+    } catch (err) {
+      throw err;
+    }
+  }
+
   async findMyCarpoolRooms(userId: number) {
     try {
       const rooms = await this.carpoolRoomRepository.findMyCarpools(userId);
@@ -90,6 +109,25 @@ class CarpoolService {
       ok: 1,
       message: 'createCarpool success',
       room,
+    }
+  }
+
+  async editCarpoolRoom(id: number, dto: UpdateCarpoolDto) {
+    try {
+      const room = await this.carpoolRoomRepository.update(id, dto);
+      if (!room) {
+        return {
+          ok: 0,
+          message: `Failed to edit carpool ${id}`
+        };
+      }
+      return {
+        ok: 1,
+        message: 'edit Carpool success',
+        room
+      };
+    } catch (err) {
+      throw err;
     }
   }
 
