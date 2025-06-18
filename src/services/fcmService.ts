@@ -3,11 +3,12 @@ import { MulticastMessage, getMessaging } from "firebase-admin/messaging";
 import redisClient from '@utils/redis';
 import FcmTokenRepository from "@repositories/fcmTokenRepository";
 import { requestRegistTokenDto, requestDeleteTokenDto } from "@dtos/fcmTokenDto";
+import { notificationMessageDto } from "@dtos/notificationDto";
 
 const fcmTokenRepository = new FcmTokenRepository();
 
 class FcmService {
-    async sendNotificationMessage(chat: chatDto) {
+    async sendChatNotificationMessage(chat: chatDto) {
         try {
             const result = await redisClient.hGet("carpoolMember", chat.roomId.toString());
             let memberList: number[] = [];
@@ -22,15 +23,14 @@ class FcmService {
                 tokens = [...tokens, ...memberTokens];
             }
 
-            this.sendMessage(tokens, chat);
+            this._sendChatMessage(tokens, chat);
 
         } catch (err: any) {
             throw err;            
-        }
-        
+        }        
     }  
 
-    private async sendMessage(tokens: string[], chat: chatDto){
+    private async _sendChatMessage(tokens: string[], chat: chatDto){
         try {
             const rawSender = await redisClient.hGet("userInfo", chat.senderId.toString());
             var senderName;
@@ -62,7 +62,7 @@ class FcmService {
                     },
                     payload: {
                         aps: {
-                            category: "OPEN_CHATROOM",  // 여기가 clickAction에 해당됨
+                            // category: "OPEN_CHATROOM",  // 여기가 clickAction에 해당됨
                         }
                     }
                 },
@@ -75,6 +75,108 @@ class FcmService {
                 .catch(error => {
                     console.log('Error sending:', error);
                 });
+
+        } catch (err: any) {
+            throw err;
+        }
+    }
+
+    async sendCarpoolEnterNotificationMessage(userId: number, roomId: number) {
+        try {
+            const result = await redisClient.hGet("carpoolMember", roomId.toString());
+            let memberList: number[] = [];
+            if (result) {memberList = JSON.parse(result);}
+
+            let tokens: string[] = [];
+
+            for (const member of memberList) {
+                if ( member == userId) continue;
+                if ( !await this.getFirebaseToken(member) ) { this.setFirebaseToken(member);}
+                const memberTokens = await this.getFirebaseToken(member);
+                tokens = [...tokens, ...memberTokens];
+            }
+
+            const userResult = await redisClient.hGet("userInfo", userId.toString());
+            let userName: string = "";
+            if (userResult) { userName = JSON.parse(userResult).name; }
+
+            const notificationDTO: notificationMessageDto = {
+                title: "",
+                body: `${userName} 님이 카풀에 참여하셨습니다.`,
+                channelId: "carpool_channel",
+            }
+
+            this._sendNotificationMessage(tokens, notificationDTO);
+
+        } catch (err: any) {
+            throw err;
+        }
+    }
+
+    async sendCarpoolLeaveNotificationMessage(userId: number, roomId: number) {
+        try {
+            const result = await redisClient.hGet("carpoolMember", roomId.toString());
+            let memberList: number[] = [];
+            if (result) {memberList = JSON.parse(result);}
+
+            let tokens: string[] = [];
+
+            for (const member of memberList) {
+                if ( member == userId) continue;
+                if ( !await this.getFirebaseToken(member) ) { this.setFirebaseToken(member);}
+                const memberTokens = await this.getFirebaseToken(member);
+                tokens = [...tokens, ...memberTokens];
+            }
+
+            const userResult = await redisClient.hGet("userInfo", userId.toString());
+            let userName: string = "";
+            if (userResult) { userName = JSON.parse(userResult).name; }            
+
+            const notificationDTO: notificationMessageDto = {
+                title: "",
+                body: `${userName} 님이 카풀에서 떠나셨습니다.`,
+                channelId: "carpool_channel",
+            }
+
+            this._sendNotificationMessage(tokens, notificationDTO);         
+
+        } catch (err: any) {
+            throw err;
+        }
+    }
+
+    private async _sendNotificationMessage(tokens: string[], notificationMessage: notificationMessageDto) {
+        try {
+            const message: MulticastMessage = {
+                tokens: tokens,
+                notification: {
+                    title: notificationMessage.title,
+                    body: notificationMessage.body,
+                },
+                android: {
+                    notification: {
+                        channelId: notificationMessage.channelId,
+                    },
+                }, 
+                apns: {
+                    headers: {
+                        
+                    },
+                    payload: {
+                        aps: {
+                            // category: "OPEN_CHATROOM",  // 여기가 clickAction에 해당됨
+                        }
+                    }
+                },
+            }
+
+            getMessaging().sendEachForMulticast(message)
+                .then(response => {
+                    console.log('Successfully sent:', response.successCount);
+                })
+                .catch(error => {
+                    console.log('Error sending:', error);
+                });            
 
         } catch (err: any) {
             throw err;

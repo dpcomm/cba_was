@@ -34,7 +34,7 @@ export default async function(socket: Socket, chatDTO: chatDto, callback: Functi
         //
         socket.to('chatroom:' + chatDTO.roomId).emit("chat", chat);
 
-        fcmService.sendNotificationMessage(chatDTO);
+        fcmService.sendChatNotificationMessage(chatDTO);
 
         const result = {
             success: true,

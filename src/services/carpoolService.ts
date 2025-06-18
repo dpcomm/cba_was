@@ -3,6 +3,9 @@ import { getIO } from "@socket/socket";
 import redisClient from "@utils/redis";
 import CarpoolMemberRepository from "@repositories/carpoolMemberRepository";
 import CarpoolRoomRepository from "@repositories/carpoolRoomRepository";
+import FcmService from "./fcmService";
+
+const fcmService = new FcmService();
 
 class CarpoolService {
   private carpoolRoomRepository = new CarpoolRoomRepository();
@@ -161,6 +164,8 @@ class CarpoolService {
       console.log(`${userId} join to chatroom:${roomId}`);
     }
 
+    //notice
+    await fcmService.sendCarpoolEnterNotificationMessage(userId, roomId);
 
     return {
       ok: 1,
@@ -191,6 +196,8 @@ class CarpoolService {
         console.log(`${userId} leave to chatroom:${roomId}`);
       }
 
+      //notice
+      await fcmService.sendCarpoolLeaveNotificationMessage(userId, roomId);
 
       return {
         ok: 1,
