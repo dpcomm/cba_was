@@ -31,8 +31,11 @@
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
+    "firebase-admin": "^13.4.0",
     "jsonwebtoken": "^9.0.2",
+    "node-cron": "^4.0.5",
     "redis": "^4.6.6",
+    "socket.io": "^4.8.1",
     "winston": "^3.13.0",
     "winston-daily-rotate-file": "^5.0.0"
   }

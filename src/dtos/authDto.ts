@@ -58,3 +58,13 @@ export interface updateGroupDto {
   userId: string,
   group: string
 }
+
+export interface updateNameDto {
+  id: number,
+  name: string
+}
+
+export interface updatePhoneDto {
+  id: number,
+  phone: string
+}
