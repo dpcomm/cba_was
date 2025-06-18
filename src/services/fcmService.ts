@@ -149,14 +149,15 @@ class FcmService {
         try {
             const message: MulticastMessage = {
                 tokens: tokens,
-                notification: {
+                data: {
                     title: notificationMessage.title,
                     body: notificationMessage.body,
+                    channelId: notificationMessage.channelId,
                 },
                 android: {
-                    notification: {
-                        channelId: notificationMessage.channelId,
-                    },
+                    // notification: {
+                    //     channelId: notificationMessage.channelId,
+                    // },
                 }, 
                 apns: {
                     headers: {
