@@ -15,14 +15,24 @@ class FcmService {
             let memberList: number[] = [];
             if (result) {memberList = JSON.parse(result)}
 
+            console.log("---------------------------------memberList-------------------------------------------");
+            console.log(memberList);
+            console.log("---------------------------------memberList-------------------------------------------");
+
             let tokens: string[] = [];
 
             for (const member of memberList) {
                 if ( member == chat.senderId) continue;
-                if ( !await this.getFirebaseToken(member) ) { this.setFirebaseToken(member); }
+                const tempResult = await this.getFirebaseToken(member);
+
+                if (  !tempResult || tempResult.length === 0 ) { await this.setFirebaseToken(member); }
                 const memberTokens = await this.getFirebaseToken(member);
-                tokens = [...tokens, ...memberTokens];
+                if(memberTokens != null) { tokens = [...tokens, ...memberTokens]; }
             }
+
+            console.log("---------------------------------tokens-------------------------------------------");
+            console.log(tokens);
+            console.log("---------------------------------tokens-------------------------------------------");
 
             this._sendChatMessage(tokens, chat);
 
@@ -101,7 +111,7 @@ class FcmService {
                 if ( member == userId) continue;
                 if ( !await this.getFirebaseToken(member) ) { this.setFirebaseToken(member);}
                 const memberTokens = await this.getFirebaseToken(member);
-                tokens = [...tokens, ...memberTokens];
+                if(memberTokens != null) { tokens = [...tokens, ...memberTokens]; }
             }
 
             const userResult = await redisClient.hGet("userInfo", userId.toString());
@@ -133,7 +143,7 @@ class FcmService {
                 if ( member == userId) continue;
                 if ( !await this.getFirebaseToken(member) ) { this.setFirebaseToken(member);}
                 const memberTokens = await this.getFirebaseToken(member);
-                tokens = [...tokens, ...memberTokens];
+                if(memberTokens != null) { tokens = [...tokens, ...memberTokens]; }
             }
 
             const userResult = await redisClient.hGet("userInfo", userId.toString());
@@ -202,8 +212,9 @@ class FcmService {
     async setFirebaseToken(userId: number) {
         try {
             const hashKey = "userFirebaseToken";
-            const tokens = fcmTokenRepository.getTokens(userId);
+            const tokens = await fcmTokenRepository.getTokens(userId);
 
+            if(tokens == null || (tokens.length === 0)) { return; }
             await redisClient.hSet(hashKey, userId.toString(), JSON.stringify(tokens));
         } catch (err: any) {
             throw err;
