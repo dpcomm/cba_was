@@ -109,7 +109,8 @@ class FcmService {
 
             for (const member of memberList) {
                 if ( member == userId) continue;
-                if ( !await this.getFirebaseToken(member) ) { this.setFirebaseToken(member);}
+                const tempResult = await this.getFirebaseToken(member);
+                if ( !tempResult || tempResult.length === 0 ) { await this.setFirebaseToken(member);}
                 const memberTokens = await this.getFirebaseToken(member);
                 if(memberTokens != null) { tokens = [...tokens, ...memberTokens]; }
             }
@@ -141,7 +142,8 @@ class FcmService {
 
             for (const member of memberList) {
                 if ( member == userId) continue;
-                if ( !await this.getFirebaseToken(member) ) { this.setFirebaseToken(member);}
+                const tempResult = await this.getFirebaseToken(member);
+                if ( !tempResult || tempResult.length === 0 ) { await this.setFirebaseToken(member);}
                 const memberTokens = await this.getFirebaseToken(member);
                 if(memberTokens != null) { tokens = [...tokens, ...memberTokens]; }
             }
