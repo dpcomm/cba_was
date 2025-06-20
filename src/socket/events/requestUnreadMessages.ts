@@ -2,6 +2,7 @@ import { chatDto } from '@dtos/chatDto';
 import redisClient from '@utils/redis';
 import { Socket } from 'socket.io';
 import ChatRepository from '@repositories/chatRepository';
+import stringify from 'json-stable-stringify';
 
 const chatRepository = new ChatRepository();
 const MAX_MESSAGES = 50;
@@ -25,7 +26,7 @@ export default async function ( socket: Socket, recentChatDTO: chatDto, requestA
             if (mysqlChats.length > 0) {
                 const redisZaddData = mysqlChats.map(chat => ({
                     score: new Date(chat.timestamp).getTime() + chat.senderId * 1e-5,
-                    value: JSON.stringify(chat),
+                    value: stringify(chat)!,
                 }));
                 await redisClient.zAdd(redisKey, redisZaddData);
             }
@@ -49,7 +50,7 @@ export default async function ( socket: Socket, recentChatDTO: chatDto, requestA
                 if (mysqlChats.length > 0) {
                     const redisZaddData = mysqlChats.map(chat => ({
                         score: new Date(chat.timestamp).getTime() + chat.senderId * 1e-5,
-                        value: JSON.stringify(chat),
+                        value: stringify(chat)!,
                     }));
                     await redisClient.zAdd(redisKey, redisZaddData);
                 }

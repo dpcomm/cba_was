@@ -17,7 +17,7 @@ export default async function ( socket: Socket, chatDTO: chatDto, callback: Func
         // const exact = await redisClient.zRangeByScore(redisKey, timestamp, timestamp);
         const rank = await redisClient.zRank(redisKey, stringify(chatDTO)!);
         console.log(`rank: ${rank}`);
-        console.log(`targetChat: ${JSON.stringify(chatDTO)}`);
+        console.log(`targetChat: ${stringify(chatDTO)}`);
         console.log('current Redis list');
         const currentRedis = await redisClient.zRange(redisKey, 0, -1, {withScores: true} as any);
         console.log(currentRedis);
