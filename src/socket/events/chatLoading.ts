@@ -2,6 +2,7 @@ import { chatDto } from '@dtos/chatDto';
 import redisClient from '@utils/redis';
 import { Socket } from 'socket.io';
 import ChatRepository from '@repositories/chatRepository';
+import stringify from 'json-stable-stringify';
 
 const chatRepository = new ChatRepository();
 const MAX_MESSAGES = 50;
@@ -14,7 +15,12 @@ export default async function ( socket: Socket, chatDTO: chatDto, callback: Func
         console.log(`user${chatDTO.senderId} request message loading`);
 
         // const exact = await redisClient.zRangeByScore(redisKey, timestamp, timestamp);
-        const rank = await redisClient.zRank(redisKey, JSON.stringify(chatDTO));
+        const rank = await redisClient.zRank(redisKey, stringify(chatDTO)!);
+        console.log(`rank: ${rank}`);
+        console.log(`targetChat: ${JSON.stringify(chatDTO)}`);
+        console.log('current Redis list');
+        const currentRedis = await redisClient.zRange(redisKey, 0, -1, {withScores: true} as any);
+        console.log(currentRedis);
 
         if (rank == null) {
             //현재 redis에 있는 가장 오래된 chat의 timestamp 구하기
@@ -28,36 +34,40 @@ export default async function ( socket: Socket, chatDTO: chatDto, callback: Func
             if (mysqlChats.length > 0) {
                 const redisZaddData = mysqlChats.map(chat => ({
                     score: new Date(chat.timestamp).getTime() + chat.senderId * 1e-5,
-                    value: JSON.stringify(chat),
+                    value: stringify(chat)!,
                 }));
                 await redisClient.zAdd(redisKey, redisZaddData);
             }
 
             const requestedChats: chatDto[] = await chatRepository.getChatsForward(chatDTO.roomId, chatDTO.senderId, new Date(chatDTO.timestamp), 50);
+            console.log(requestedChats);
             if (requestedChats.length > 0) {
                 const redisZaddData = requestedChats.map(chat => ({
                     score: new Date(chat.timestamp).getTime() + chat.senderId * 1e-5,
-                    value: JSON.stringify(chat),
+                    value: stringify(chat)!,
                 }));
                 await redisClient.zAdd(redisKey, redisZaddData);
             }
-        } else if (rank >= 50) {
+        } else if (rank >= 50) { 
             
         } else {
             const requestedChats: chatDto[] = await chatRepository.getChatsForward(chatDTO.roomId, chatDTO.senderId, new Date(chatDTO.timestamp), 50 - rank);
             if (requestedChats.length > 0) {
                 const redisZaddData = requestedChats.map(chat => ({
                     score: new Date(chat.timestamp).getTime() + chat.senderId * 1e-5,
-                    value: JSON.stringify(chat),
+                    value: stringify(chat)!,
                 }));
                 await redisClient.zAdd(redisKey, redisZaddData);
             }            
         }
 
+        var currentRank = await redisClient.zRank(redisKey, stringify(chatDTO)!);
+        if (currentRank == null) currentRank = 50;
+        console.log(`currentRank: ${currentRank}`);
         const rawResults = await redisClient.zRange(
             redisKey, 
-            rank != null && rank >= 50 ? rank - 50 : 0,
-            rank != null && rank >= 50 ? rank - 1: 49,
+            currentRank != null && currentRank >= 50 ? currentRank - 50 : 0,
+            currentRank != null && currentRank >= 50 ? currentRank - 1: currentRank,
         );
 
         const chats = rawResults.map(chat => JSON.parse(chat) as chatDto);
