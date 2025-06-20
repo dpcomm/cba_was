@@ -10,6 +10,7 @@ const fcmTokenRepository = new FcmTokenRepository();
 class FcmService {
     async sendChatNotificationMessage(chat: chatDto) {
         try {
+            console.log("send chat notification enter ");
             const result = await redisClient.hGet("carpoolMember", chat.roomId.toString());
             let memberList: number[] = [];
             if (result) {memberList = JSON.parse(result)}
@@ -32,6 +33,13 @@ class FcmService {
 
     private async _sendChatMessage(tokens: string[], chat: chatDto){
         try {
+            console.log("send chat notification internal enter ");
+
+            if(!tokens || tokens.length === 0) {
+                console.log("tokens is not exist")
+                return;
+            }
+
             const rawSender = await redisClient.hGet("userInfo", chat.senderId.toString());
             var senderName;
 
@@ -147,6 +155,12 @@ class FcmService {
 
     private async _sendNotificationMessage(tokens: string[], notificationMessage: notificationMessageDto) {
         try {
+
+            if(!tokens || tokens.length === 0) {
+                console.log("tokens is not exist")
+                return;
+            }
+            
             const message: MulticastMessage = {
                 tokens: tokens,
                 data: {
