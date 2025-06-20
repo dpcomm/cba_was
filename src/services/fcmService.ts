@@ -89,6 +89,27 @@ class FcmService {
             getMessaging().sendEachForMulticast(message)
                 .then(response => {
                     console.log('Successfully sent:', response.successCount);
+
+                    // 유효하지 않은(에러 발생한) 토큰 추출
+                    const invalidTokens:string[] = [];
+                    response.responses.forEach((resp, idx) => {
+                        if (!resp.success) {
+                            // 대표적인 에러 코드: 'messaging/invalid-registration-token', 'messaging/registration-token-not-registered'
+                            const code = resp.error?.code;
+                            if (
+                            code === 'messaging/invalid-registration-token' ||
+                            code === 'messaging/registration-token-not-registered'
+                            ) {
+                            invalidTokens.push(message.tokens[idx]);
+                            }
+                        }
+                    });
+
+                    if (invalidTokens.length > 0) {
+                        console.log('유효하지 않은 토큰:', invalidTokens);
+                        // 이 토큰들을 DB 등에서 삭제 처리
+                        this.deleteInvalidTokens(invalidTokens);
+                    }
                 })
                 .catch(error => {
                     console.log('Error sending:', error);
@@ -309,6 +330,26 @@ class FcmService {
                 userId: result.userId,
                 token: result.token,
             });
+
+        } catch (err) {
+            throw err;
+        }
+    }
+
+    async deleteInvalidTokens(tokens: string[]) {
+        try {
+            for (const token of tokens) {
+                const user = await fcmTokenRepository.findToken(token);
+                const deleteTokenDTO: requestDeleteTokenDto = {
+                    token: token,
+                };
+
+                if(user != null) {
+                    await this.removeFirebaseToken(user?.userId, token);
+                    await this.deleteToken(deleteTokenDTO);
+                    console.log(`delete invalid token: ${token}`);
+                }
+            }
 
         } catch (err) {
             throw err;
