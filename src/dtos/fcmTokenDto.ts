@@ -1,6 +1,7 @@
 export interface requestRegistTokenDto {
     userId: number,
     token: string,
+    platform: string,
 }
 
 export interface requestDeleteTokenDto {

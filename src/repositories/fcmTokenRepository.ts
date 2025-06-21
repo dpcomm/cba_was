@@ -9,6 +9,7 @@ class FcmTokenRepository {
             data: {
                 userId: tokenDTO.userId,
                 token: tokenDTO.token,
+                platform: tokenDTO.platform,
             }
         });
     }
