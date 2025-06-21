@@ -136,6 +136,7 @@ model FcmToken {
   id      Int @id @default(autoincrement())
   userId  Int
   token   String  @unique
+  platform  String 
 
   user  User  @relation("UserTokens", fields: [userId], references: [id])
   @@index([userId])

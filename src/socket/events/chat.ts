@@ -2,6 +2,7 @@ import { Socket } from "socket.io";
 import { chatDto } from "@dtos/chatDto";
 import redisClient from "@utils/redis";
 import FcmService from "@services/fcmService";
+import stringify from "json-stable-stringify";
 
 const fcmService = new FcmService();
 
@@ -27,7 +28,7 @@ export default async function(socket: Socket, chatDTO: chatDto, callback: Functi
         await redisClient.zAdd(`chatroom:${chatDTO.roomId}:message`, [
             {
                 score: chat.timestamp.getTime() + chat.senderId * 1e-5, 
-                value: JSON.stringify(chat)
+                value: stringify(chat)!,
            }
         ]);
         

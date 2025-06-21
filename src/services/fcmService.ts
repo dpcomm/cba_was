@@ -2,7 +2,7 @@ import { chatDto } from "@dtos/chatDto";
 import { MulticastMessage, getMessaging } from "firebase-admin/messaging";
 import redisClient from '@utils/redis';
 import FcmTokenRepository from "@repositories/fcmTokenRepository";
-import { requestRegistTokenDto, requestDeleteTokenDto } from "@dtos/fcmTokenDto";
+import { requestRegistTokenDto, requestDeleteTokenDto, Token } from "@dtos/fcmTokenDto";
 import { notificationMessageDto } from "@dtos/notificationDto";
 
 const fcmTokenRepository = new FcmTokenRepository();
@@ -10,18 +10,29 @@ const fcmTokenRepository = new FcmTokenRepository();
 class FcmService {
     async sendChatNotificationMessage(chat: chatDto) {
         try {
+            console.log("send chat notification enter ");
             const result = await redisClient.hGet("carpoolMember", chat.roomId.toString());
             let memberList: number[] = [];
             if (result) {memberList = JSON.parse(result)}
 
-            let tokens: string[] = [];
+            console.log("---------------------------------memberList-------------------------------------------");
+            console.log(memberList);
+            console.log("---------------------------------memberList-------------------------------------------");
+
+            let tokens: Token[] = [];
 
             for (const member of memberList) {
                 if ( member == chat.senderId) continue;
-                if ( !await this.getFirebaseToken(member) ) { this.setFirebaseToken(member); }
+                const tempResult = await this.getFirebaseToken(member);
+
+                if (  !tempResult || tempResult.length === 0 ) { await this.setFirebaseToken(member); }
                 const memberTokens = await this.getFirebaseToken(member);
-                tokens = [...tokens, ...memberTokens];
+                if(memberTokens != null) { tokens = [...tokens, ...memberTokens]; }
             }
+
+            console.log("---------------------------------tokens-------------------------------------------");
+            console.log(tokens);
+            console.log("---------------------------------tokens-------------------------------------------");
 
             this._sendChatMessage(tokens, chat);
 
@@ -30,51 +41,152 @@ class FcmService {
         }        
     }  
 
-    private async _sendChatMessage(tokens: string[], chat: chatDto){
+    private async _sendChatMessage(tokens: Token[], chat: chatDto){
         try {
+            console.log("send chat notification internal enter ");
+
+            if(!tokens || tokens.length === 0) {
+                console.log("tokens is not exist")
+                return;
+            }
+
             const rawSender = await redisClient.hGet("userInfo", chat.senderId.toString());
             var senderName;
 
             if (rawSender) { senderName = JSON.parse(rawSender)['name']; }
 
-            const message: MulticastMessage = {
-                tokens : tokens, 
-                data: {
-                    roomId: `${chat.roomId}`,
-                    title: `New message in Room ${chat.roomId}`,
-                    body: `${senderName}: ${chat.message}`,       
-                    channelId: "chat_channel",
-                },
-                // notification: {
-                //     title: `New message in Room ${chat.roomId}`,
-                //     body: `${chat.senderId}: ${chat.message}`,
-                // },
-                android: {
-                    collapseKey: chat.roomId.toString(),
-                    // notification: {
-                    //     channelId: "chat_channel",
-                    //     clickAction: "OPEN_CHATROOM",
-                    // },
-                }, 
-                apns: {
-                    headers: {
-                        "apns-collapse-id": chat.roomId.toString(),
-                    },
-                    payload: {
-                        aps: {
-                            // category: "OPEN_CHATROOM",  // 여기가 clickAction에 해당됨
-                        }
-                    }
-                },
-            } 
+            let androidTokens: string[] = [];
+            let iosTokens: string[] = [];
+            
+            for (const token of tokens) {
+                if(token.platform == 'android') {
+                    androidTokens.push(token.token);
+                } else {
+                    iosTokens.push(token.token);
+                }
+            }
 
-            getMessaging().sendEachForMulticast(message)
-                .then(response => {
-                    console.log('Successfully sent:', response.successCount);
-                })
-                .catch(error => {
-                    console.log('Error sending:', error);
-                });
+
+            if (androidTokens && androidTokens.length !== 0) {
+                console.log("androidTokens가 존재합니다.");
+
+                //android message
+                const androidMessage: MulticastMessage = {
+                    tokens : androidTokens, 
+                    data: {
+                        roomId: `${chat.roomId}`,
+                        title: `카풀 채팅방`,
+                        body: `${senderName}: ${chat.message}`,       
+                        channelId: "chat_channel",
+                    },
+                    // notification: {
+                    //     title: `New message in Room ${chat.roomId}`,
+                    //     body: `${chat.senderId}: ${chat.message}`,
+                    // },
+                    android: {
+                        collapseKey: chat.roomId.toString(),
+                        // notification: {
+                        //     channelId: "chat_channel",
+                        //     clickAction: "OPEN_CHATROOM",
+                        // },
+                    }, 
+                    apns: {
+                        headers: {
+                            "apns-collapse-id": chat.roomId.toString(),
+                        },
+                        payload: {
+                            aps: {
+                                // category: "OPEN_CHATROOM",  // 여기가 clickAction에 해당됨
+                            }
+                        }
+                    },
+                } 
+
+
+                //send androidMessage
+                getMessaging().sendEachForMulticast(androidMessage)
+                    .then(response => {
+                        console.log('Successfully sent:', response.successCount);
+
+                        // 유효하지 않은(에러 발생한) 토큰 추출
+                        const invalidTokens:string[] = [];
+                        response.responses.forEach((resp, idx) => {
+                            if (!resp.success) {
+                                // 대표적인 에러 코드: 'messaging/invalid-registration-token', 'messaging/registration-token-not-registered'
+                                const code = resp.error?.code;
+                                if (
+                                code === 'messaging/invalid-registration-token' ||
+                                code === 'messaging/registration-token-not-registered'
+                                ) {
+                                invalidTokens.push(androidMessage.tokens[idx]);
+                                }
+                            }
+                        });
+
+                        if (invalidTokens.length > 0) {
+                            console.log('유효하지 않은 토큰:', invalidTokens);
+                            // 이 토큰들을 DB 등에서 삭제 처리
+                            this.deleteInvalidTokens(invalidTokens);
+                        }
+                    })
+                    .catch(error => {
+                        console.log('Error sending:', error);
+                    });
+
+            } 
+            if (iosTokens && iosTokens.length !== 0) {
+                console.log("iosTokens가 존재합니다.");
+                //ios message    
+                const iosMessage: MulticastMessage = {
+                    tokens: iosTokens,
+                    notification: {
+                        title: '카풀 채팅방',
+                        body: `${senderName}: ${chat.message}`,
+                    },
+                    data: {
+                        roomId: `${chat.roomId}`,
+                    },
+                    apns: {
+                        payload: {
+                            aps: {
+                                threadId: chat.roomId.toString(),
+                            }
+                        }
+                    },
+                }
+
+                //send ios message
+                getMessaging().sendEachForMulticast(iosMessage)
+                    .then(response => {
+                        console.log('Successfully sent:', response.successCount);
+
+                        // 유효하지 않은(에러 발생한) 토큰 추출
+                        const invalidTokens:string[] = [];
+                        response.responses.forEach((resp, idx) => {
+                            if (!resp.success) {
+                                // 대표적인 에러 코드: 'messaging/invalid-registration-token', 'messaging/registration-token-not-registered'
+                                const code = resp.error?.code;
+                                if (
+                                code === 'messaging/invalid-registration-token' ||
+                                code === 'messaging/registration-token-not-registered'
+                                ) {
+                                invalidTokens.push(iosMessage.tokens[idx]);
+                                }
+                            }
+                        });
+
+                        if (invalidTokens.length > 0) {
+                            console.log('유효하지 않은 토큰:', invalidTokens);
+                            // 이 토큰들을 DB 등에서 삭제 처리
+                            this.deleteInvalidTokens(invalidTokens);
+                        }
+                    })
+                    .catch(error => {
+                        console.log('Error sending:', error);
+                    });
+            }
+
+
 
         } catch (err: any) {
             throw err;
@@ -87,13 +199,14 @@ class FcmService {
             let memberList: number[] = [];
             if (result) {memberList = JSON.parse(result);}
 
-            let tokens: string[] = [];
+            let tokens: Token[] = [];
 
             for (const member of memberList) {
                 if ( member == userId) continue;
-                if ( !await this.getFirebaseToken(member) ) { this.setFirebaseToken(member);}
+                const tempResult = await this.getFirebaseToken(member);
+                if ( !tempResult || tempResult.length === 0 ) { await this.setFirebaseToken(member);}
                 const memberTokens = await this.getFirebaseToken(member);
-                tokens = [...tokens, ...memberTokens];
+                if(memberTokens != null) { tokens = [...tokens, ...memberTokens]; }
             }
 
             const userResult = await redisClient.hGet("userInfo", userId.toString());
@@ -101,12 +214,12 @@ class FcmService {
             if (userResult) { userName = JSON.parse(userResult).name; }
 
             const notificationDTO: notificationMessageDto = {
-                title: "",
+                title: "카풀 알림",
                 body: `${userName} 님이 카풀에 참여하셨습니다.`,
                 channelId: "carpool_channel",
             }
 
-            this._sendNotificationMessage(tokens, notificationDTO);
+            this._sendNotificationMessage(tokens, notificationDTO, roomId);
 
         } catch (err: any) {
             throw err;
@@ -119,17 +232,18 @@ class FcmService {
             let memberList: number[] = [];
             if (result) {memberList = JSON.parse(result);}
 
-            let tokens: string[] = [];
+            let tokens: Token[] = [];
 
             for (const member of memberList) {
                 if ( member == userId) continue;
-                if ( !await this.getFirebaseToken(member) ) { this.setFirebaseToken(member);}
+                const tempResult = await this.getFirebaseToken(member);
+                if ( !tempResult || tempResult.length === 0 ) { await this.setFirebaseToken(member);}
                 const memberTokens = await this.getFirebaseToken(member);
-                tokens = [...tokens, ...memberTokens];
+                if(memberTokens != null) { tokens = [...tokens, ...memberTokens]; }
             }
 
             const userResult = await redisClient.hGet("userInfo", userId.toString());
-            let userName: string = "";
+            let userName: string = "카풀 알림";
             if (userResult) { userName = JSON.parse(userResult).name; }            
 
             const notificationDTO: notificationMessageDto = {
@@ -138,46 +252,123 @@ class FcmService {
                 channelId: "carpool_channel",
             }
 
-            this._sendNotificationMessage(tokens, notificationDTO);         
+            this._sendNotificationMessage(tokens, notificationDTO, roomId);         
 
         } catch (err: any) {
             throw err;
         }
     }
 
-    private async _sendNotificationMessage(tokens: string[], notificationMessage: notificationMessageDto) {
+    private async _sendNotificationMessage(tokens: Token[], notificationMessage: notificationMessageDto, roomId: number) {
         try {
-            const message: MulticastMessage = {
-                tokens: tokens,
-                data: {
-                    title: notificationMessage.title,
-                    body: notificationMessage.body,
-                    channelId: notificationMessage.channelId,
-                },
-                android: {
-                    // notification: {
-                    //     channelId: notificationMessage.channelId,
-                    // },
-                }, 
-                apns: {
-                    headers: {
-                        
-                    },
-                    payload: {
-                        aps: {
-                            // category: "OPEN_CHATROOM",  // 여기가 clickAction에 해당됨
-                        }
-                    }
-                },
+
+            if(!tokens || tokens.length === 0) {
+                console.log("tokens is not exist")
+                return;
+            }
+            
+
+            let androidTokens: string[] = [];
+            let iosTokens: string[] = [];
+            
+            for (const token of tokens) {
+                if(token.platform == 'ios') {
+                    iosTokens.push(token.token);
+                } else {
+                    androidTokens.push(token.token);
+                }
             }
 
-            getMessaging().sendEachForMulticast(message)
-                .then(response => {
-                    console.log('Successfully sent:', response.successCount);
-                })
-                .catch(error => {
-                    console.log('Error sending:', error);
-                });            
+
+
+            if (androidTokens && androidTokens.length !== 0) {
+
+                //android message
+                const message: MulticastMessage = {
+                    tokens: androidTokens,
+                    data: {
+                        title: notificationMessage.title,
+                        body: notificationMessage.body,
+                        channelId: notificationMessage.channelId,
+                    },
+                    android: {
+                        // notification: {
+                        //     channelId: notificationMessage.channelId,
+                        // },
+                    }, 
+                    apns: {
+                        headers: {
+                            
+                        },
+                        payload: {
+                            aps: {
+                                // category: "OPEN_CHATROOM",  // 여기가 clickAction에 해당됨
+                            }
+                        }
+                    },
+                }
+
+                getMessaging().sendEachForMulticast(message)
+                    .then(response => {
+                        console.log('Successfully sent:', response.successCount);
+                    })
+                    .catch(error => {
+                        console.log('Error sending:', error);
+                    });            
+            }
+
+            if (iosTokens && iosTokens.length !== 0) {
+
+                //ios message
+                const iosMessage: MulticastMessage = {
+                    tokens: iosTokens,
+                    notification: {
+                        title: notificationMessage.title,
+                        body: notificationMessage.body,
+                    },
+                    data: {
+                        roomId: `${roomId}`,
+                    },
+                    apns: {
+                        payload: {
+                            aps: {
+                                threadId: roomId.toString(),
+                            }
+                        }
+                    },
+                }
+
+                //send ios message
+                getMessaging().sendEachForMulticast(iosMessage)
+                    .then(response => {
+                        console.log('Successfully sent:', response.successCount);
+
+                        // 유효하지 않은(에러 발생한) 토큰 추출
+                        const invalidTokens:string[] = [];
+                        response.responses.forEach((resp, idx) => {
+                            if (!resp.success) {
+                                // 대표적인 에러 코드: 'messaging/invalid-registration-token', 'messaging/registration-token-not-registered'
+                                const code = resp.error?.code;
+                                if (
+                                code === 'messaging/invalid-registration-token' ||
+                                code === 'messaging/registration-token-not-registered'
+                                ) {
+                                invalidTokens.push(iosMessage.tokens[idx]);
+                                }
+                            }
+                        });
+
+                        if (invalidTokens.length > 0) {
+                            console.log('유효하지 않은 토큰:', invalidTokens);
+                            // 이 토큰들을 DB 등에서 삭제 처리
+                            this.deleteInvalidTokens(invalidTokens);
+                        }
+                    })
+                    .catch(error => {
+                        console.log('Error sending:', error);
+                    });            
+                }
+
 
         } catch (err: any) {
             throw err;
@@ -188,8 +379,9 @@ class FcmService {
     async setFirebaseToken(userId: number) {
         try {
             const hashKey = "userFirebaseToken";
-            const tokens = fcmTokenRepository.getTokens(userId);
+            const tokens = await fcmTokenRepository.getTokens(userId);
 
+            if(tokens == null || (tokens.length === 0)) { return; }
             await redisClient.hSet(hashKey, userId.toString(), JSON.stringify(tokens));
         } catch (err: any) {
             throw err;
@@ -210,12 +402,12 @@ class FcmService {
     }
 
     //append token to redis
-    async addFirebaseToken(userId: number, token: string) {
+    async addFirebaseToken(userId: number, token: Token) {
         try {
             const hashKey = "userFirebaseToken";
 
             const existing = await redisClient.hGet(hashKey, userId.toString());
-            let tokens: string[] = [];
+            let tokens: Token[] = [];
 
             if (existing) { tokens = JSON.parse(existing); }
             tokens.push(token);
@@ -231,10 +423,10 @@ class FcmService {
             const hashKey = "userFirebaseToken";
 
             const existing = await redisClient.hGet(hashKey, userId.toString());
-            let tokens: string[] = [];
+            let tokens: Token[] = [];
 
             if (existing) { tokens = JSON.parse(existing); }
-            const result = tokens.filter(t => t !== token);
+            const result = tokens.filter(t => t.token !== token);
             await redisClient.hSet(hashKey, userId.toString(), JSON.stringify(result));
 
         } catch (err: any) {
@@ -282,6 +474,26 @@ class FcmService {
                 userId: result.userId,
                 token: result.token,
             });
+
+        } catch (err) {
+            throw err;
+        }
+    }
+
+    async deleteInvalidTokens(tokens: string[]) {
+        try {
+            for (const token of tokens) {
+                const user = await fcmTokenRepository.findToken(token);
+                const deleteTokenDTO: requestDeleteTokenDto = {
+                    token: token,
+                };
+
+                if(user != null) {
+                    await this.removeFirebaseToken(user?.userId, token);
+                    await this.deleteToken(deleteTokenDTO);
+                    console.log(`delete invalid token: ${token}`);
+                }
+            }
 
         } catch (err) {
             throw err;

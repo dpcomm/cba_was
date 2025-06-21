@@ -1,4 +1,4 @@
-import { requestRegistTokenDto } from '@dtos/fcmTokenDto';
+import { requestRegistTokenDto, Token } from '@dtos/fcmTokenDto';
 import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient();
@@ -9,6 +9,7 @@ class FcmTokenRepository {
             data: {
                 userId: tokenDTO.userId,
                 token: tokenDTO.token,
+                platform: tokenDTO.platform,
             }
         });
     }
@@ -17,17 +18,14 @@ class FcmTokenRepository {
             where: { token: token },
         });
     }
-    async getTokens(userId: number): Promise<string[]>{
+    async getTokens(userId: number): Promise<Token[]>{
         const result = await prisma.fcmToken.findMany({
             where: {
                 userId: userId,
             },
-            select: {
-                token: true,
-            },
         });
 
-        return result.map(e => e.token);
+        return result;
     }
     async findToken(token: string) {
         return await prisma.fcmToken.findUnique({
