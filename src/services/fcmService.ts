@@ -75,7 +75,7 @@ class FcmService {
                     tokens : androidTokens, 
                     data: {
                         roomId: `${chat.roomId}`,
-                        title: `New message in Room ${chat.roomId}`,
+                        title: `카풀 채팅방`,
                         body: `${senderName}: ${chat.message}`,       
                         channelId: "chat_channel",
                     },
@@ -140,7 +140,7 @@ class FcmService {
                 const iosMessage: MulticastMessage = {
                     tokens: iosTokens,
                     notification: {
-                        title: 'New message',
+                        title: '카풀 채팅방',
                         body: `${senderName}: ${chat.message}`,
                     },
                     data: {
@@ -214,7 +214,7 @@ class FcmService {
             if (userResult) { userName = JSON.parse(userResult).name; }
 
             const notificationDTO: notificationMessageDto = {
-                title: "",
+                title: "카풀 알림",
                 body: `${userName} 님이 카풀에 참여하셨습니다.`,
                 channelId: "carpool_channel",
             }
@@ -243,7 +243,7 @@ class FcmService {
             }
 
             const userResult = await redisClient.hGet("userInfo", userId.toString());
-            let userName: string = "";
+            let userName: string = "카풀 알림";
             if (userResult) { userName = JSON.parse(userResult).name; }            
 
             const notificationDTO: notificationMessageDto = {
