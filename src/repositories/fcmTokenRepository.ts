@@ -18,13 +18,10 @@ class FcmTokenRepository {
             where: { token: token },
         });
     }
-    async getTokens(userId: number): Promise<string[]>{
+    async getTokens(userId: number){
         const result = await prisma.fcmToken.findMany({
             where: {
                 userId: userId,
-            },
-            select: {
-                token: true,
             },
         });
 

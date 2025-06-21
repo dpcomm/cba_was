@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import FcmService from '@services/fcmService';
-import { requestRefreshTokenDto, requestRegistTokenDto, requestDeleteTokenDto } from '@dtos/fcmTokenDto';
+import { requestRefreshTokenDto, requestRegistTokenDto, requestDeleteTokenDto, Token } from '@dtos/fcmTokenDto';
 import logger from '@utils/logger';
 
 const fcmService = new FcmService();
@@ -12,8 +12,14 @@ class FcmTokenController {
             const registData: any = await fcmService.registToken(tokenDTO);
             if (registData.ok) {
                 logger.http(`Token Regist ${registData.userId} ${registData.token}`);
+                
+                const token: Token = {
+                    userId: registData.userId,
+                    token: registData.token,
+                    platform: registData.platform,
+                }
 
-                await fcmService.addFirebaseToken(registData.userId, registData.token);
+                await fcmService.addFirebaseToken(registData.userId, token);
 
                 return res.status(201).json({
                     message: "Token Regist success",
@@ -66,7 +72,7 @@ class FcmTokenController {
         try {
             const refreshTokenDTO: requestRefreshTokenDto = req.body;
             const removeTokenDTO: requestDeleteTokenDto = {token: refreshTokenDTO.oldToken};
-            const registTokenDTO: requestRegistTokenDto = {userId: refreshTokenDTO.userId, token: refreshTokenDTO.newToken};
+            const registTokenDTO: requestRegistTokenDto = {userId: refreshTokenDTO.userId, token: refreshTokenDTO.newToken, platform: refreshTokenDTO.platform};
 
             const removeData: any = await fcmService.deleteToken(removeTokenDTO);
             const registData: any = await fcmService.registToken(registTokenDTO);
@@ -74,8 +80,15 @@ class FcmTokenController {
             if (removeData.ok && registData.ok) {
                 logger.http(`Token Refresh ${refreshTokenDTO.oldToken} to ${refreshTokenDTO.newToken}`);
 
-                await fcmService.removeFirebaseToken(removeData.userId, removeData.token);                
-                await fcmService.addFirebaseToken(registData.userId, registData.token);
+                await fcmService.removeFirebaseToken(removeData.userId, removeData.token);   
+                
+                const token: Token = {
+                    userId: registData.userId,
+                    token: registData.token,
+                    platform: registData.platform,
+                }
+                
+                await fcmService.addFirebaseToken(registData.userId, token);
 
                 return res.status(200).json({
                     message: "Token Refresh success",
