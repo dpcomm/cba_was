@@ -59,10 +59,10 @@ class FcmService {
             let iosTokens: string[] = [];
             
             for (const token of tokens) {
-                if(token.platform == 'ios') {
-                    iosTokens.push(token.token);
-                } else {
+                if(token.platform == 'android') {
                     androidTokens.push(token.token);
+                } else {
+                    iosTokens.push(token.token);
                 }
             }
 
