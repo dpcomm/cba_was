@@ -17,6 +17,7 @@ import carpoolRouter from "@routes/carpool";
 import "@firebase/firebaseAdmin";
 import fcmRouter from "@routes/fcmToken";
 import statusRouter from "@routes/status";
+import chatreportRouter from "@routes/chatreport";
 
 dotenv.config();
 const app = express();
@@ -43,6 +44,7 @@ app.use("/api/pray", prayRouter);
 app.use("/api/dashboard", dashboardRouter);
 app.use("/api/carpool", carpoolRouter);
 app.use("/api/fcm", fcmRouter);
+app.use("/api/chatreport", chatreportRouter);
 
 //previous version - only used express
 // app.listen(process.env.SERVER_PORT, () => {
