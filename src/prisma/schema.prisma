@@ -27,6 +27,9 @@ model User {
   joinedRooms    CarpoolMember[]
   chats       Chat[]         @relation("UserChats")
   tokens      FcmToken[]     @relation("UserTokens")
+
+  reportsMade      ChatReport[]       @relation("UserReportsMade")
+  reportsReceived  ChatReport[]       @relation("UserReportsReceived")
 }
 
 model Application {
@@ -102,6 +105,7 @@ model CarpoolRoom {
   driver         User              @relation("DriverRooms", fields: [driverId], references: [id])
   members        CarpoolMember[]
   chats          Chat[]
+  reports        ChatReport[]
 }
 
 model CarpoolMember {
@@ -129,6 +133,23 @@ model Chat {
   @@unique([senderId, roomId, message, timestamp])
   @@index([roomId])
   @@index([senderId])
+}
+
+model ChatReport {
+  id              Int           @id @default(autoincrement())
+  reporterId      Int
+  reportedUserId  Int
+  roomId          Int
+  reason          String
+  createdAt       DateTime      @default(now())
+
+  reporter        User          @relation("UserReportsMade", fields: [reporterId], references: [id])
+  reported        User          @relation("UserReportsReceived", fields: [reportedUserId], references: [id])
+  room            CarpoolRoom   @relation(fields: [roomId], references: [id])
+
+  @@index([reporterId])
+  @@index([reportedUserId])
+  @@index([roomId])
 }
 
 
