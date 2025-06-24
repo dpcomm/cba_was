@@ -30,6 +30,7 @@ model User {
 
   reportsMade      ChatReport[]       @relation("UserReportsMade")
   reportsReceived  ChatReport[]       @relation("UserReportsReceived")
+  consents Consent[]
 }
 
 model Application {
@@ -161,4 +162,17 @@ model FcmToken {
 
   user  User  @relation("UserTokens", fields: [userId], references: [id])
   @@index([userId])
+}
+
+model Consent {
+  userId       Int
+  consentType  String
+  consentedAt  DateTime  @default(now())
+  value        Boolean
+
+  user         User      @relation(fields: [userId], references: [id])
+
+  @@id([userId, consentType])
+  @@index([userId])
+  @@map("user_consents")
 }

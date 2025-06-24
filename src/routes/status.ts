@@ -6,6 +6,5 @@ const statusRouter = express.Router();
 const statusController = new StatusController();
 
 statusRouter.get('/version/application', statusController.getApplicationVersion);
-// statusRouter.post('/', verifyAuth, statusController.createPray);
 
 export default statusRouter;
