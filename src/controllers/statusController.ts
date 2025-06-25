@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import logger from '@utils/logger';
-import version from '@config/version.json';
+import version from '@config/status.json';
 
 class StatusController {
   async getApplicationVersion(req: Request, res: Response) {

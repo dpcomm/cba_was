@@ -10,5 +10,13 @@
       "1.0.0: 어플리케이션 출시"
     ],
     "updateUrl": "https://recba.me/carpool-download"
+  },
+  "consents": {
+    "privacyPolicy": {
+      "title": "개인정보 처리방침",
+      "url": "https://recba.me/carpool-privacy",
+      "version": 1,
+      "updatedAt": "2025-06-24"
+    }
   }
 }

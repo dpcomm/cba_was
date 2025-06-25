@@ -27,6 +27,10 @@ model User {
   joinedRooms    CarpoolMember[]
   chats       Chat[]         @relation("UserChats")
   tokens      FcmToken[]     @relation("UserTokens")
+
+  reportsMade      ChatReport[]       @relation("UserReportsMade")
+  reportsReceived  ChatReport[]       @relation("UserReportsReceived")
+  consents Consent[]
 }
 
 model Application {
@@ -102,6 +106,7 @@ model CarpoolRoom {
   driver         User              @relation("DriverRooms", fields: [driverId], references: [id])
   members        CarpoolMember[]
   chats          Chat[]
+  reports        ChatReport[]
 }
 
 model CarpoolMember {
@@ -131,6 +136,23 @@ model Chat {
   @@index([senderId])
 }
 
+model ChatReport {
+  id              Int           @id @default(autoincrement())
+  reporterId      Int
+  reportedUserId  Int
+  roomId          Int
+  reason          String
+  createdAt       DateTime      @default(now())
+
+  reporter        User          @relation("UserReportsMade", fields: [reporterId], references: [id])
+  reported        User          @relation("UserReportsReceived", fields: [reportedUserId], references: [id])
+  room            CarpoolRoom   @relation(fields: [roomId], references: [id])
+
+  @@index([reporterId])
+  @@index([reportedUserId])
+  @@index([roomId])
+}
+
 
 model FcmToken {
   id      Int @id @default(autoincrement())
@@ -140,4 +162,17 @@ model FcmToken {
 
   user  User  @relation("UserTokens", fields: [userId], references: [id])
   @@index([userId])
+}
+
+model Consent {
+  userId       Int
+  consentType  String
+  consentedAt  DateTime  @default(now())
+  value        Boolean
+
+  user         User      @relation(fields: [userId], references: [id])
+
+  @@id([userId, consentType])
+  @@index([userId])
+  @@map("user_consents")
 }
