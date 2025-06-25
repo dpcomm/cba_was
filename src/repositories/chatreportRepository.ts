@@ -8,7 +8,7 @@ class ChatreportRepository {
         return await prisma.chatReport.create({
             data: {
                 reporterId: report.reporterId,
-                reportedUserId: report.reportedId,
+                reportedUserId: report.reportedUserId,
                 roomId: report.roomId,
                 reason: report.reason,
             }
