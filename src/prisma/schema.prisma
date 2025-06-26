@@ -18,6 +18,7 @@ model User {
   phone     String
   birth     DateTime
   gender    String
+  isDeleted Boolean   @default(false)
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 
