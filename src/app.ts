@@ -9,7 +9,7 @@ import applicationRouter from "@routes/application";
 import youtubeRouter from "@routes/youtube";
 import prayRouter from "@routes/pray";
 import dashboardRouter from "@routes/dashboard";
-import { createServer } from "https";
+import { createServer } from "http";
 import { Server } from "socket.io";
 import { setupSocketEvents } from "@socket/socket";
 import "@utils/cron";
@@ -19,10 +19,6 @@ import fcmRouter from "@routes/fcmToken";
 import statusRouter from "@routes/status";
 import chatreportRouter from "@routes/chatreport";
 import consentRouter from "@routes/consent";
-import * as https from "https";
-
-const fs = require("fs");
-
 
 dotenv.config();
 const app = express();
@@ -32,15 +28,8 @@ redisClient.on('connect', () => { logger.info("Redis connected on redis containe
 redisClient.on('error', (err: any) => { logger.error(`Redis client error`, err) });
 
 //socket.io server
-const options:https.ServerOptions = {
-  key : fs.readdirSync("ssl_certificate /etc/letsencrypt/live/recba.me/fullchain.pem;"),
-  cert : fs.readdirSync("ssl_certificate_key /etc/letsencrypt/live/recba.me/privkey.pem;"),
-  requestCert : false, // 클라이언트로부터 인증서를 요청할지 여부를 결정, default : false
-  rejectUnauthorized : true, // 인증서가 유효하지 않은 경우 연결을 거부, default : true
-}
-
-const httpsServer = createServer(options, app);
-const io = new Server(httpsServer);
+const httpServer = createServer(app);
+const io = new Server(httpServer);
 
 setupSocketEvents(io);
 
@@ -65,6 +54,6 @@ app.use("/api/chatreport", chatreportRouter);
 // });
 
 //
-httpsServer.listen(process.env.SERVER_PORT, () => {
+httpServer.listen(process.env.SERVER_PORT, () => {
 	logger.info(`Server app listening on port ${process.env.SERVER_PORT}`);
 });

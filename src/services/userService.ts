@@ -22,6 +22,13 @@ class UserService {
         })
       };
 
+      if (user.isDeleted) {
+        return ({
+          ok: 0,
+          message: "Deleted user"
+        })
+      };
+
       const isPasswordCorrect = await bcrypt.compare(userDTO.password, user.password);
       if (!isPasswordCorrect) {
         return ({
@@ -240,7 +247,7 @@ class UserService {
         user.gender !== gender ||
         user.phone !== phone ||
         user.group !== group ||
-        user.birth.toISOString().split("T")[0] !== birth
+        user.birth!.toISOString().split("T")[0] !== birth
       ) {
         return {
           ok: 0,
