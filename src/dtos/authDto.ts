@@ -68,3 +68,7 @@ export interface updatePhoneDto {
   id: number,
   phone: string
 }
+
+export interface deleteUserDto {
+  id: number,
+}

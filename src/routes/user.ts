@@ -17,5 +17,6 @@ userRouter.post('/reset-password', userController.resetPassword);
 userRouter.post('/:user/group', userController.updateUserGroup);
 userRouter.post('/update-name', verifyAuth, userController.updateUserName);
 userRouter.post('/update-phone', verifyAuth, userController.updateUserPhone);
+userRouter.post('/delete', verifyAuth, userController.delete);
 
 export default userRouter;
