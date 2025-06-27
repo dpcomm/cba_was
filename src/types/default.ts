@@ -7,11 +7,12 @@ export interface user {
   name: string;
   group: string;
   phone: string;
-  birth: Date;
-  gender: string;
+  birth: Date | null;
+  gender: string | null;
   rank: string;
   createdAt: Date;
   updatedAt: Date;
+  isDeleted: boolean;
 }
 
 export interface application {

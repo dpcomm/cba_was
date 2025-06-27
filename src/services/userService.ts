@@ -1,4 +1,4 @@
-import { requestAuthCheckDto, requestLoginUserDto, requestLogoutUserDto, requestRefreshAccessTokenDto, requestRegisterUserDto, checkUserDto, updateUserDto, resetPasswordDto, updateGroupDto, updateNameDto, updatePhoneDto } from "@dtos/authDto";
+import { requestAuthCheckDto, requestLoginUserDto, requestLogoutUserDto, requestRefreshAccessTokenDto, requestRegisterUserDto, checkUserDto, updateUserDto, resetPasswordDto, updateGroupDto, updateNameDto, updatePhoneDto, deleteUserDto } from "@dtos/authDto";
 import bcrypt from "bcrypt";
 import { user } from "@/types/default";
 import UserRepository from "@repositories/userRepository";
@@ -19,6 +19,13 @@ class UserService {
         return ({
           ok: 0,
           message: "Unregisterd user"
+        })
+      };
+
+      if (user.isDeleted) {
+        return ({
+          ok: 0,
+          message: "Deleted user"
         })
       };
 
@@ -240,7 +247,7 @@ class UserService {
         user.gender !== gender ||
         user.phone !== phone ||
         user.group !== group ||
-        user.birth.toISOString().split("T")[0] !== birth
+        user.birth!.toISOString().split("T")[0] !== birth
       ) {
         return {
           ok: 0,
@@ -374,6 +381,19 @@ class UserService {
       return {
         ok: 1,
         message: "Update phone success"
+      };
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async deleteUser (userDTO: deleteUserDto) {
+    try {
+      await userRepository.deleteUser(userDTO);
+
+      return {
+        ok: 1,
+        message: "Delete user success",
       };
     } catch (err) {
       throw err;
