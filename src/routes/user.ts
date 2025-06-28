@@ -15,6 +15,7 @@ userRouter.post('/update', verifyAuth, userController.updateUser);
 userRouter.post('/check-user', userController.checkUser);
 userRouter.post('/reset-password', userController.resetPassword);
 userRouter.post('/:user/group', userController.updateUserGroup);
+userRouter.post('/:user/birth', userController.updateUserBirth);
 userRouter.post('/update-name', verifyAuth, userController.updateUserName);
 userRouter.post('/update-phone', verifyAuth, userController.updateUserPhone);
 userRouter.post('/delete', verifyAuth, userController.delete);

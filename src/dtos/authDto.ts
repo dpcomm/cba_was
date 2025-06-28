@@ -69,6 +69,11 @@ export interface updatePhoneDto {
   phone: string
 }
 
+export interface updateBirthDto {
+  userId: string,
+  birth: string
+}
+
 export interface deleteUserDto {
   id: number,
 }

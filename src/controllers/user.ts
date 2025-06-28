@@ -12,6 +12,7 @@ import {
   updateGroupDto,
   updateNameDto,
   updatePhoneDto,
+  updateBirthDto,
   deleteUserDto,
 } from '@dtos/authDto';
 import logger from '@utils/logger';
@@ -252,7 +253,7 @@ class UserController {
         message: updateGroupData.message
       });
     } catch (err: any) {
-      logger.error("resetPassword controller error:", err);
+      logger.error("updateUserGroup controller error:", err);
       return res.status(500).json({
         message: err.message,
         err: err
@@ -295,6 +296,27 @@ class UserController {
 
     } catch (err: any) {
       return res.status(500).json({ message: err.message, err: err });
+    }
+  }
+
+  async updateUserBirth(req: Request, res: Response) {
+    try {
+      const updateBirthDto: updateBirthDto = req.body;
+      const updateBirthData = await userService.updateUserBirth(updateBirthDto)
+      if (updateBirthData.ok) {
+        return res.status(200).json({
+          message: "update UserBirth success"
+        });
+      }
+      return res.status(401).json({
+        message: updateBirthData.message
+      });
+    } catch (err: any) {
+      logger.error("updateUserBirth controller error:", err);
+      return res.status(500).json({
+        message: err.message,
+        err: err
+      });
     }
   }
 
