@@ -68,3 +68,8 @@ export interface updatePhoneDto {
   id: number,
   phone: string
 }
+
+export interface updateBirthDto {
+  userId: string,
+  birth: Date
+}
