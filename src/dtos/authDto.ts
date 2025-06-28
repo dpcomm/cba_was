@@ -71,7 +71,7 @@ export interface updatePhoneDto {
 
 export interface updateBirthDto {
   userId: string,
-  birth: Date
+  birth: string
 }
 
 export interface deleteUserDto {

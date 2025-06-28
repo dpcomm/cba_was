@@ -253,7 +253,7 @@ class UserController {
         message: updateGroupData.message
       });
     } catch (err: any) {
-      logger.error("resetPassword controller error:", err);
+      logger.error("updateUserGroup controller error:", err);
       return res.status(500).json({
         message: err.message,
         err: err
@@ -302,17 +302,17 @@ class UserController {
   async updateUserBirth(req: Request, res: Response) {
     try {
       const updateBirthDto: updateBirthDto = req.body;
-      const updateGroupData = await userService.updateUserBirth(updateBirthDto)
-      if (updateGroupData.ok) {
+      const updateBirthData = await userService.updateUserBirth(updateBirthDto)
+      if (updateBirthData.ok) {
         return res.status(200).json({
-          message: "Password reset success"
+          message: "update UserBirth success"
         });
       }
       return res.status(401).json({
-        message: updateGroupData.message
+        message: updateBirthData.message
       });
     } catch (err: any) {
-      logger.error("resetPassword controller error:", err);
+      logger.error("updateUserBirth controller error:", err);
       return res.status(500).json({
         message: err.message,
         err: err
