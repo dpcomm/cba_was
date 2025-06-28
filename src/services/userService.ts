@@ -1,4 +1,4 @@
-import { requestAuthCheckDto, requestLoginUserDto, requestLogoutUserDto, requestRefreshAccessTokenDto, requestRegisterUserDto, checkUserDto, updateUserDto, resetPasswordDto, updateGroupDto, updateNameDto, deleteUserDto, updatePhoneDto } from "@dtos/authDto";
+import { requestAuthCheckDto, requestLoginUserDto, requestLogoutUserDto, requestRefreshAccessTokenDto, requestRegisterUserDto, checkUserDto, updateUserDto, resetPasswordDto, updateGroupDto, updateNameDto, deleteUserDto, updatePhoneDto,updateBirthDto } from "@dtos/authDto";
 import bcrypt from "bcrypt";
 import { user } from "@/types/default";
 import UserRepository from "@repositories/userRepository";
@@ -402,7 +402,11 @@ class UserService {
       return {
         ok: 1,
         message: "Update birth success"
-
+        };
+    } catch (err) {
+      throw err;
+    }
+  }
   async deleteUser (userDTO: deleteUserDto) {
     try {
       await userRepository.deleteUser(userDTO);

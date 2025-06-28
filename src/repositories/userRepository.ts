@@ -1,4 +1,4 @@
-import { requestRegisterUserDto, updateUserDto, updateGroupDto, updateNameDto, updatePhoneDto,deleteUserDto } from '@dtos/authDto';
+import { requestRegisterUserDto, updateUserDto, updateGroupDto, updateNameDto, updatePhoneDto,deleteUserDto,updateBirthDto } from '@dtos/authDto';
 import { PrismaClient } from '@prisma/client'
 
 
