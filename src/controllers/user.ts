@@ -13,6 +13,7 @@ import {
   updateNameDto,
   updatePhoneDto,
   updateBirthDto,
+  deleteUserDto,
 } from '@dtos/authDto';
 import logger from '@utils/logger';
 
@@ -312,6 +313,28 @@ class UserController {
       });
     } catch (err: any) {
       logger.error("resetPassword controller error:", err);
+      return res.status(500).json({
+        message: err.message,
+        err: err
+      });
+    }
+  }
+
+  async delete(req: Request, res: Response) {
+    try {
+      const userDTO: deleteUserDto = req.body;
+      const deleteData: any = await userService.deleteUser(userDTO);
+      if (deleteData.ok) {
+        logger.http(`Delete user ${userDTO.id}`);
+        return res.status(200).json({
+          message: "Delete success",
+        });
+      }
+      return res.status(401).json({
+        message: deleteData.message,
+      });
+    } catch (err: any) {
+      logger.error("Delete controller error:", err)
       return res.status(500).json({
         message: err.message,
         err: err

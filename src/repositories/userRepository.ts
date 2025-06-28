@@ -1,4 +1,4 @@
-import { requestRegisterUserDto, updateUserDto, updateGroupDto, updateNameDto, updatePhoneDto, updateBirthDto } from '@dtos/authDto';
+import { requestRegisterUserDto, updateUserDto, updateGroupDto, updateNameDto, updatePhoneDto,deleteUserDto } from '@dtos/authDto';
 import { PrismaClient } from '@prisma/client'
 
 
@@ -91,6 +91,15 @@ class UserRepository {
       where: {userId: birthDTO.userId},
       data: {
         birth: new Date(birthDTO.birth),
+      },
+    });
+  }
+
+  async deleteUser(userDTO: deleteUserDto) {
+    return await prisma.user.update({
+      where: {id: userDTO.id},
+      data: {
+        isDeleted: true
       },
     });
   }

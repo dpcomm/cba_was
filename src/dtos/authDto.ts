@@ -73,3 +73,7 @@ export interface updateBirthDto {
   userId: string,
   birth: Date
 }
+
+export interface deleteUserDto {
+  id: number,
+}
