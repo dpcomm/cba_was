@@ -207,4 +207,17 @@ export default class CarpoolRoomRepository {
   async delete(id: number): Promise<CarpoolRoom> {
     return prisma.carpoolRoom.delete({ where: { id } });
   }
+
+  async getDriver(id: number) {
+    const result = await prisma.carpoolRoom.findUnique({
+      where: {
+        id,
+      },
+      select: {
+        driverId: true,
+      }
+    });
+
+    return result?.driverId ?? null;
+  }
 }

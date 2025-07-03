@@ -4,8 +4,12 @@ import redisClient from '@utils/redis';
 import FcmTokenRepository from "@repositories/fcmTokenRepository";
 import { requestRegistTokenDto, requestDeleteTokenDto, Token } from "@dtos/fcmTokenDto";
 import { notificationMessageDto } from "@dtos/notificationDto";
+import CarpoolMemberRepository from "@repositories/carpoolMemberRepository";
+import CarpoolRoomRepository from "@repositories/carpoolRoomRepository";
 
 const fcmTokenRepository = new FcmTokenRepository();
+const carpoolMemberRepository = new CarpoolMemberRepository();
+const carpoolRoomRepository = new CarpoolRoomRepository();
 
 class FcmService {
     async sendChatNotificationMessage(chat: chatDto) {
@@ -243,17 +247,70 @@ class FcmService {
             }
 
             const userResult = await redisClient.hGet("userInfo", userId.toString());
-            let userName: string = "카풀 알림";
+            let userName: string = "";
             if (userResult) { userName = JSON.parse(userResult).name; }            
 
             const notificationDTO: notificationMessageDto = {
-                title: "",
+                title: "카풀 알림",
                 body: `${userName} 님이 카풀에서 떠나셨습니다.`,
                 channelId: "carpool_channel",
             }
 
             this._sendNotificationMessage(tokens, notificationDTO, roomId);         
 
+        } catch (err: any) {
+            throw err;
+        }
+    }
+
+    async sendCarpoolReadyNotificationMessage(roomId: number) {
+        try {
+            const driver = await carpoolRoomRepository.getDriver(roomId);
+
+            let tokens: Token[] = [];
+
+            if(driver != null) {
+                const tempResult = await this.getFirebaseToken(driver);
+                if ( !tempResult || tempResult.length === 0 ) { await this.setFirebaseToken(driver);}
+                const memberTokens = await this.getFirebaseToken(driver);
+                if(memberTokens != null) { tokens = [...tokens, ...memberTokens]; }
+            }
+
+            const notificationDTO: notificationMessageDto = {
+                title: "카풀 알림",
+                body: "카풀시작이 활성화되었습니다. 출발할 때 카풀 시작버튼을 눌러주세요.",
+                channelId: "carpool_channel",
+            }
+
+            this._sendNotificationMessage(tokens, notificationDTO, roomId);
+
+        } catch (err: any) {
+            throw err;
+        }
+    }
+
+    async sendCarpoolStartNotificationMessage(roomId: number) {
+        try {
+            const memberList = await carpoolMemberRepository.findUserByCarpoolId(roomId);
+            const driver = await carpoolRoomRepository.getDriver(roomId);
+
+            let tokens: Token[] = [];
+
+            for (const member of memberList) {
+                if ( member == driver) continue;
+                const tempResult = await this.getFirebaseToken(member);
+                if ( !tempResult || tempResult.length === 0 ) { await this.setFirebaseToken(member);}
+                const memberTokens = await this.getFirebaseToken(member);
+                if(memberTokens != null) { tokens = [...tokens, ...memberTokens]; }
+            }
+
+            const notificationDTO: notificationMessageDto = {
+                title: "카풀 알림",
+                body: "카풀 운전자가 출발했습니다. 카풀 장소에 시간에 늦지않게 도착해주세요.",
+                channelId: "carpool_channel",
+            }
+
+            this._sendNotificationMessage(tokens, notificationDTO, roomId);
         } catch (err: any) {
             throw err;
         }
