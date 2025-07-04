@@ -18,6 +18,12 @@ cron.schedule('*/5 * * * *', () => {
     carpoolService.checkCarpoolReady(currentTime);
 });
 
+cron.schedule('0 */1 * * *', () => {
+    console.log("old carpool arrive update");
+    const currentTime: Date = new Date();
+    carpoolService.oldCarpoolArriveUpdate(currentTime);
+});
+
 // cron.schedule('* * * * *', () => {
 //     console.log("test flush start");
 //     chatService.flushAllChats();

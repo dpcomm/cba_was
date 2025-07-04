@@ -259,6 +259,14 @@ class CarpoolService {
       throw err;
     }
   }
+
+  async oldCarpoolArriveUpdate(currentTime: Date) {
+    try {
+      await this.carpoolRoomRepository.oldCarpoolArriveUpdate(currentTime);
+    } catch (err: any) {
+      throw err;
+    }
+  }
 }
 
 export default CarpoolService;

@@ -228,7 +228,7 @@ export default class CarpoolRoomRepository {
     const targetTime = new Date(baseTime);
     targetTime.setMinutes(baseTime.getMinutes() + 5);
 
-    const result = prisma.carpoolRoom.findMany({
+    const result = await prisma.carpoolRoom.findMany({
       where: {
         departureTime: {
           gte: baseTime,
@@ -242,5 +242,22 @@ export default class CarpoolRoomRepository {
     });
 
     return (await result).map(e => e.id);
+  }
+
+  async oldCarpoolArriveUpdate(currentTime: Date) {
+    const baseTime = new Date(currentTime);
+    baseTime.setDate(baseTime.getDate() -1);
+
+    return await prisma.carpoolRoom.updateMany({
+      where: {
+        departureTime: {
+          lte: baseTime,
+        },
+        isArrived: false,
+      },
+      data: {
+        isArrived: true,
+      },      
+    });
   }
 }
