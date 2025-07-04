@@ -220,4 +220,27 @@ export default class CarpoolRoomRepository {
 
     return result?.driverId ?? null;
   }
+
+  async findReadyCarpool(currentTime: Date): Promise<number[]> {
+    const baseTime = new Date(currentTime);
+    baseTime.setHours(baseTime.getHours() + 1, baseTime.getMinutes(), 0, 0);
+
+    const targetTime = new Date(baseTime);
+    targetTime.setMinutes(baseTime.getMinutes() + 5);
+
+    const result = prisma.carpoolRoom.findMany({
+      where: {
+        departureTime: {
+          gte: baseTime,
+          lt: targetTime,
+        },
+        isArrived: false,
+      },
+      select: {
+        id: true,
+      }
+    });
+
+    return (await result).map(e => e.id);
+  }
 }
