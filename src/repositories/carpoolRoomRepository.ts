@@ -100,7 +100,7 @@ export default class CarpoolRoomRepository {
         }
       }
     },
-    orderBy: { departureTime: 'asc' },
+    orderBy: { departureTime: 'desc' },
     include: {
       driver: {
         select: { id: true, name: true, phone: true }
