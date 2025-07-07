@@ -63,6 +63,7 @@ export interface CarpoolRoomDetailDto {
   isArrived: boolean;
   createdAt: Date;
   updatedAt: Date;
+  status: string;
   driver: {
     id: number;
     name: string;

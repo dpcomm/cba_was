@@ -267,6 +267,32 @@ class CarpoolService {
       throw err;
     }
   }
+
+  async updateCarpoolStatus(roomId: number, newStatus: string) {
+    try {
+      const updatedRoom = await this.carpoolRoomRepository.updateStatus(roomId, newStatus);
+
+      if (!updatedRoom) {
+        return {
+          ok: 0,
+          message: `Failed to update status for carpool ${roomId} to ${newStatus}`
+        };
+      }
+
+      return {
+        ok: 1,
+        message: `Carpool ${roomId} status updated to ${newStatus} success`,
+        room: updatedRoom
+      };
+    } catch (err: any) {
+      console.error(`Error updating carpool ${roomId} status to ${newStatus}:`, err);
+
+      return {
+        ok: 0,
+        message: `Failed to update carpool status due to an internal error: ${err.message || err.toString()}`
+      };
+    }
+  }
 }
 
 export default CarpoolService;

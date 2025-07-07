@@ -2,6 +2,7 @@
 import { Request, Response } from 'express';
 import logger from '@utils/logger';
 import CarpoolService from '@services/carpoolService';
+import FcmService from '@services/fcmService';
 import {
   CreateCarpoolDto,
   UpdateCarpoolInfoDto,
@@ -20,8 +21,11 @@ class CarpoolController {
     this.deleteCarpoolRoom = this.deleteCarpoolRoom.bind(this);
     this.joinCarpoolRoom = this.joinCarpoolRoom.bind(this);
     this.leaveCarpoolRoom = this.leaveCarpoolRoom.bind(this);
+    this.updateCarpoolStatus = this.updateCarpoolStatus.bind(this);
+    this.sendCarpoolStartNotificationMessage = this.sendCarpoolStartNotificationMessage.bind(this);
   }
   private carpoolService = new CarpoolService();
+  private fcmService = new FcmService();
 
   async getAllCarpoolRooms(req: Request, res: Response) {
     try {
@@ -224,6 +228,37 @@ class CarpoolController {
       return res.status(400).json({ message: result.message });
     } catch (err: any) {
       logger.error('CarpoolController#leaveCarpoolRoom error:', err);
+      return res.status(500).json({ message: err.message, err });
+    }
+  }
+
+  async updateCarpoolStatus(req: Request, res: Response) {
+    try {
+      const { roomId, newStatus } = req.body;
+      const result: any = await this.carpoolService.updateCarpoolStatus(roomId, newStatus);
+      if (result.ok) {
+        logger.http(`updateCarpoolStatus room:${roomId}, newStatus:${newStatus}`);
+        return res.status(200).json({ message: 'Success updateCarpoolStatus' });
+      }
+      return res.status(400).json({ message: result.message });
+    } catch (err: any) {
+      logger.error('CarpoolController#updateCarpoolStatus error:', err);
+      return res.status(500).json({ message: err.message, err });
+    }
+  }
+
+  async sendCarpoolStartNotificationMessage(req: Request, res: Response) {
+    try {
+      const roomId = Number(req.params.id);
+      const result: any = await this.fcmService.sendCarpoolStartNotificationMessage(roomId);
+      
+      if (result.ok) {
+        logger.http(`sendCarpoolStartNotificationMessage room:${roomId}`);
+        return res.status(200).json({ message: 'Success sendStartMessages' });
+      }
+      return res.status(400).json({ message: result.message });
+    } catch (err: any) {
+      logger.error('CarpoolController#sendCarpoolStartNotificationMessage error:', err);
       return res.status(500).json({ message: err.message, err });
     }
   }

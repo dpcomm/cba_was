@@ -78,6 +78,7 @@ export default class CarpoolRoomRepository {
       isArrived: room.isArrived,
       createdAt: room.createdAt,
       updatedAt: room.updatedAt,
+      status: room.status,
       driver: {
         id: room.driver.id,
         name: room.driver.name,
@@ -259,5 +260,18 @@ export default class CarpoolRoomRepository {
         isArrived: true,
       },      
     });
+  }
+
+  async updateStatus(roomId: number, newStatus: string) {
+    try {
+      const updatedRoom = await prisma.carpoolRoom.update({
+        where: { id: roomId },
+        data: { status: newStatus },
+      });
+      return updatedRoom;
+    } catch (error) {
+      console.error(`Failed to update carpool status in DB for room ${roomId}:`, error);
+      return null;
+    }
   }
 }

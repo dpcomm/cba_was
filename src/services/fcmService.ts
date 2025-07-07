@@ -310,7 +310,9 @@ class FcmService {
                 channelId: "carpool_channel",
             }
 
-            this._sendNotificationMessage(tokens, notificationDTO, roomId);
+            await this._sendNotificationMessage(tokens, notificationDTO, roomId);
+            return { ok: true, message: '카풀 출발 알림 전송 요청 성공'};
+
         } catch (err: any) {
             throw err;
         }
