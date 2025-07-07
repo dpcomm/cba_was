@@ -258,7 +258,8 @@ export default class CarpoolRoomRepository {
       },
       data: {
         isArrived: true,
-      },      
+        status: 'arrived'
+      },
     });
   }
 
