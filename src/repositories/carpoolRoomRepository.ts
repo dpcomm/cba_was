@@ -78,6 +78,7 @@ export default class CarpoolRoomRepository {
       isArrived: room.isArrived,
       createdAt: room.createdAt,
       updatedAt: room.updatedAt,
+      status: room.status,
       driver: {
         id: room.driver.id,
         name: room.driver.name,
@@ -100,7 +101,7 @@ export default class CarpoolRoomRepository {
         }
       }
     },
-    orderBy: { departureTime: 'asc' },
+    orderBy: { departureTime: 'desc' },
     include: {
       driver: {
         select: { id: true, name: true, phone: true }
@@ -206,5 +207,72 @@ export default class CarpoolRoomRepository {
 
   async delete(id: number): Promise<CarpoolRoom> {
     return prisma.carpoolRoom.delete({ where: { id } });
+  }
+
+  async getDriver(id: number) {
+    const result = await prisma.carpoolRoom.findUnique({
+      where: {
+        id,
+      },
+      select: {
+        driverId: true,
+      }
+    });
+
+    return result?.driverId ?? null;
+  }
+
+  async findReadyCarpool(currentTime: Date): Promise<number[]> {
+    const baseTime = new Date(currentTime);
+    baseTime.setHours(baseTime.getHours() + 1, baseTime.getMinutes(), 0, 0);
+
+    const targetTime = new Date(baseTime);
+    targetTime.setMinutes(baseTime.getMinutes() + 5);
+
+    const result = await prisma.carpoolRoom.findMany({
+      where: {
+        departureTime: {
+          gte: baseTime,
+          lt: targetTime,
+        },
+        isArrived: false,
+      },
+      select: {
+        id: true,
+      }
+    });
+
+    return (await result).map(e => e.id);
+  }
+
+  async oldCarpoolArriveUpdate(currentTime: Date) {
+    const baseTime = new Date(currentTime);
+    baseTime.setDate(baseTime.getDate() -1);
+
+    return await prisma.carpoolRoom.updateMany({
+      where: {
+        departureTime: {
+          lte: baseTime,
+        },
+        isArrived: false,
+      },
+      data: {
+        isArrived: true,
+        status: 'arrived'
+      },
+    });
+  }
+
+  async updateStatus(roomId: number, newStatus: string) {
+    try {
+      const updatedRoom = await prisma.carpoolRoom.update({
+        where: { id: roomId },
+        data: { status: newStatus },
+      });
+      return updatedRoom;
+    } catch (error) {
+      console.error(`Failed to update carpool status in DB for room ${roomId}:`, error);
+      return null;
+    }
   }
 }

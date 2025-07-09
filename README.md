@@ -60,13 +60,11 @@ npx prisma migrate deploy
 
 ---
 
-## 4. Prisma DB Push (DDL 동기화)
+## 4. Prisma Schena 코드 내 동기화
 
 ```bash
-npx prisma db push
+npx prisma generate
 ```
-
-> Prisma 스키마 변경 사항을 실제 DB에 반영합니다 (데이터 삭제 없이 스키마만 push).
 
 ---
 

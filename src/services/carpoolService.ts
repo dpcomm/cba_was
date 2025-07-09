@@ -4,6 +4,7 @@ import redisClient from "@utils/redis";
 import CarpoolMemberRepository from "@repositories/carpoolMemberRepository";
 import CarpoolRoomRepository from "@repositories/carpoolRoomRepository";
 import FcmService from "./fcmService";
+import { listenerCount } from "process";
 
 const fcmService = new FcmService();
 
@@ -243,6 +244,53 @@ class CarpoolService {
       };
     } catch (err) {
       throw err;
+    }
+  }
+
+  async checkCarpoolReady(currentTime: Date) {
+    try {
+      const readyCarpoolList = await this.carpoolRoomRepository.findReadyCarpool(currentTime);
+      if (readyCarpoolList.length != 0) {
+        for(const carpool of readyCarpoolList) {
+          await fcmService.sendCarpoolReadyNotificationMessage(carpool);
+        }
+      }
+    } catch (err: any) {
+      throw err;
+    }
+  }
+
+  async oldCarpoolArriveUpdate(currentTime: Date) {
+    try {
+      await this.carpoolRoomRepository.oldCarpoolArriveUpdate(currentTime);
+    } catch (err: any) {
+      throw err;
+    }
+  }
+
+  async updateCarpoolStatus(roomId: number, newStatus: string) {
+    try {
+      const updatedRoom = await this.carpoolRoomRepository.updateStatus(roomId, newStatus);
+
+      if (!updatedRoom) {
+        return {
+          ok: 0,
+          message: `Failed to update status for carpool ${roomId} to ${newStatus}`
+        };
+      }
+
+      return {
+        ok: 1,
+        message: `Carpool ${roomId} status updated to ${newStatus} success`,
+        room: updatedRoom
+      };
+    } catch (err: any) {
+      console.error(`Error updating carpool ${roomId} status to ${newStatus}:`, err);
+
+      return {
+        ok: 0,
+        message: `Failed to update carpool status due to an internal error: ${err.message || err.toString()}`
+      };
     }
   }
 }

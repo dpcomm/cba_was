@@ -25,5 +25,9 @@ carpoolRouter.post("/join", verifyAuth, carpoolController.joinCarpoolRoom);
 carpoolRouter.post("/leave", verifyAuth, carpoolController.leaveCarpoolRoom);
 /* 카풀 방 삭제 */
 carpoolRouter.post("/delete/:id", verifyAuth, carpoolController.deleteCarpoolRoom);
+/* 카풀 상태 업데이트(출발, 도착) */
+carpoolRouter.post("/status", verifyAuth, carpoolController.updateCarpoolStatus); 
+/* 카풀 출발 알림 전송 */
+carpoolRouter.post("/start/:id", verifyAuth, carpoolController.sendCarpoolStartNotificationMessage);
 
 export default carpoolRouter;
