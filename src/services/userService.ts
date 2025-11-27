@@ -10,6 +10,11 @@ import { decode } from "jsonwebtoken";
 const userRepository = new UserRepository();
 const jwtProvider = new JwtProvider();
 
+const normalizeHash = (hash?: string | Buffer | null): string => {
+  if (!hash) return "";
+  return typeof hash === "string" ? hash : hash.toString("utf8");
+};
+
 
 class UserService {
   async login(userDTO: requestLoginUserDto) {
@@ -29,7 +34,8 @@ class UserService {
         })
       };
 
-      const isPasswordCorrect = await bcrypt.compare(userDTO.password, user.password);
+      const storedHash = normalizeHash(user.password);
+      const isPasswordCorrect = await bcrypt.compare(userDTO.password, storedHash);
       if (!isPasswordCorrect) {
         return ({
           ok: 0,
@@ -204,7 +210,7 @@ class UserService {
     try {
       if (checkUserDto.password) {
         const currentData = await userRepository.findUserByUserId(checkUserDto.userId);
-        const currentHash = currentData?.password ?? "";
+        const currentHash = normalizeHash(currentData?.password);
         // currentData가 null(undefined) & currentData.password도 null(undefined)일때 "" 반환
         const passwordPattern = /^(?=.*[a-zA-Z])(?=.*\d).{10,}$/;
         if (!passwordPattern.test(checkUserDto.password)) {
