@@ -19,6 +19,8 @@ import fcmRouter from "@routes/fcmToken";
 import statusRouter from "@routes/status";
 import chatreportRouter from "@routes/chatreport";
 import consentRouter from "@routes/consent";
+import swaggerUi from "swagger-ui-express";
+import specs from "@config/swagger";
 
 dotenv.config();
 const app = express();
@@ -47,6 +49,7 @@ app.use("/api/dashboard", dashboardRouter);
 app.use("/api/carpool", carpoolRouter);
 app.use("/api/fcm", fcmRouter);
 app.use("/api/chatreport", chatreportRouter);
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 
 //previous version - only used express
 // app.listen(process.env.SERVER_PORT, () => {
