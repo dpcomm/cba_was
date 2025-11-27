@@ -8,9 +8,6 @@ RUN ln -snf /usr/share/zoneinfo/Asia/Seoul /etc/localtime
 
 COPY . .
 
-# ARM에서 bcrypt 재빌드
-RUN npm rebuild bcrypt --build-from-source
-
 RUN npx prisma generate --schema=src/prisma/schema.prisma
 
 RUN npm run build

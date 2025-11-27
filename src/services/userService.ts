@@ -1,5 +1,5 @@
 import { requestAuthCheckDto, requestLoginUserDto, requestLogoutUserDto, requestRefreshAccessTokenDto, requestRegisterUserDto, checkUserDto, updateUserDto, resetPasswordDto, updateGroupDto, updateNameDto, deleteUserDto, updatePhoneDto,updateBirthDto } from "@dtos/authDto";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { user } from "@/types/default";
 import UserRepository from "@repositories/userRepository";
 import JwtProvider from "@utils/jwtProvider";
