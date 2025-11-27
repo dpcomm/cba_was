@@ -16,7 +16,7 @@ services:
       context: .
       dockerfile: ./dockerfile.prod
     ports:
-      - "8081:8081"
+      - "3000:3000"
     env_file:
       - .env
     restart: always
