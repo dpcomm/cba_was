@@ -10,7 +10,7 @@ const options: swaggerJsdoc.Options = {
     },
     servers: [
       {
-        url: 'http://localhost:8000', // Adjust port as needed, default seems to be in env but I'll put a placeholder
+        url: 'http://localhost:3000',
         description: 'Local server',
       },
     ],
@@ -29,7 +29,7 @@ const options: swaggerJsdoc.Options = {
       },
     ],
   },
-  apis: ['./src/routes/*.ts', './src/controllers/*.ts', './src/dtos/*.ts'], // Path to the API docs
+  apis: ['./src/routes/*.ts', './src/controllers/*.ts', './src/dtos/*.ts'],
 };
 
 const specs = swaggerJsdoc(options);

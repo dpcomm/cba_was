@@ -1,5 +1,5 @@
+import "@config/env"; // Must be the first import
 import express from "express";
-import dotenv from "dotenv";
 import cors from "cors";
 import bodyParser from "body-parser";
 import userRouter from "@routes/user";
@@ -22,19 +22,16 @@ import consentRouter from "@routes/consent";
 import swaggerUi from "swagger-ui-express";
 import specs from "@config/swagger";
 
-dotenv.config();
 const app = express();
 
 redisClient.connect().catch(logger.error);
 redisClient.on('connect', () => { logger.info("Redis connected on redis container") });
 redisClient.on('error', (err: any) => { logger.error(`Redis client error`, err) });
 
-//socket.io server
 const httpServer = createServer(app);
 const io = new Server(httpServer);
 
 setupSocketEvents(io);
-
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -51,12 +48,6 @@ app.use("/api/fcm", fcmRouter);
 app.use("/api/chatreport", chatreportRouter);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 
-//previous version - only used express
-// app.listen(process.env.SERVER_PORT, () => {
-// 	logger.info(`Server app listening on port ${process.env.SERVER_PORT}`);
-// });
-
-//
 httpServer.listen(process.env.SERVER_PORT, () => {
 	logger.info(`Server app listening on port ${process.env.SERVER_PORT}`);
 });

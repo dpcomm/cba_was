@@ -5,5 +5,5 @@ RUN npm i
 RUN ln -snf /usr/share/zoneinfo/Asia/Seoul /etc/localtime
 COPY . .
 RUN npm run build
-EXPOSE 8081
+EXPOSE 3000
 CMD ["npm", "run", "start"]
