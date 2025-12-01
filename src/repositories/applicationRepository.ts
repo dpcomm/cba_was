@@ -59,6 +59,8 @@ class ApplicationRepository {
         user: {
           select: {
             name: true,
+            group: true,
+            gender: true,
           },
         },
         retreat: {
@@ -77,6 +79,8 @@ class ApplicationRepository {
       bus: data.surveyData.transfer.bus,
       isLeader: data.surveyData.isLeader,
       name: data.user.name,
+      group: data.user.group,
+      gender: data.user.gender,
       title: data.retreat.title,
     }));
   }
@@ -170,11 +174,23 @@ class ApplicationRepository {
 
 
   async updateApplicationAttendedAndFeePaid(applicationDto: EditApplicationAttendedAndFeePaidDtoType) {
+    const application = await prisma.application.findUnique({ where: { id: applicationDto.id } });
+    if (!application) {
+      throw new Error("Application not found");
+    }
+
+    const currentSurvey = (application as any).surveyData || {};
+    const nextSurvey = {
+      ...currentSurvey,
+      isLeader: applicationDto.isLeader ?? currentSurvey.isLeader,
+    };
+
     return await prisma.application.update({
       where: { id: applicationDto.id },
       data: {
         attended: applicationDto.attended,
         feePaid: applicationDto.feePaid,
+        surveyData: nextSurvey,
       },
     });
   }
