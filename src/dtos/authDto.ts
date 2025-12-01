@@ -1,6 +1,6 @@
 export interface requestLoginUserDto {
   userId: string,
-  password: string | Buffer,
+  password: string,
   autoLogin: boolean,
 }
 
