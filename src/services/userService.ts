@@ -299,7 +299,7 @@ class UserService {
       return ({
         ok: 1,
         message: "getAllUser success",
-        // user
+        user
       });
     } catch (err) {
       throw err;

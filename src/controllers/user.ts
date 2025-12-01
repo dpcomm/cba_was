@@ -130,7 +130,7 @@ class UserController {
       if (getAllUserData.ok) {
         return res.status(200).json({
           message: getAllUserData.message,
-          // user: getAllUserData.user
+          user: getAllUserData.user
         });
       }
       return res.status(401).json({
