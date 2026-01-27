@@ -248,12 +248,16 @@ class UserService {
         };
       }
       const { name, gender, phone, group, birth } = checkUserDto;
+      const hasBirth = typeof birth === "string" && birth.length > 0;
+      const birthMismatch = hasBirth
+        ? (user.birth ? user.birth.toISOString().split("T")[0] !== birth : true)
+        : false;
       if (
         user.name !== name ||
         user.gender !== gender ||
         user.phone !== phone ||
         user.group !== group ||
-        user.birth!.toISOString().split("T")[0] !== birth
+        birthMismatch
       ) {
         return {
           ok: 0,
@@ -299,7 +303,7 @@ class UserService {
       return ({
         ok: 1,
         message: "getAllUser success",
-        // user
+        user
       });
     } catch (err) {
       throw err;

@@ -46,7 +46,7 @@ export interface checkUserDto {
   gender: string,
   phone: string,
   group: string,
-  birth: string,
+  birth?: string,
 }
 
 export interface resetPasswordDto {

@@ -26,4 +26,5 @@ export interface EditApplicationAttendedAndFeePaidDtoType {
   id: number,
   attended: boolean,
   feePaid: boolean,
+  isLeader?: boolean,
 }
