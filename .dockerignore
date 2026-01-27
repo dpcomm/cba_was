@@ -6,3 +6,5 @@ Dockerfile
 dockerfile
 dockerfile.prod
 npm-debug.log
+.env
+.env.*
